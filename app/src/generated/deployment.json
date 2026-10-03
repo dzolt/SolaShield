@@ -1,0 +1,21 @@
+{
+  "cluster": "devnet",
+  "programId": "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R",
+  "mint": "Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH",
+  "pool": "HXwQAHfGffPSeN6dC9gmBPDdCYty5Q4H4ZbQAUZcr285",
+  "vault": "Bnq24f5VUPjgSmWv4B9MBeqzT4oYae2KyjV3cXTP8a3J",
+  "admin": "MZFpnQimUxhRncRNDhmS4DVwnB38RBRb8wiSQZzUwNw",
+  "lockupSeconds": 600,
+  "products": [
+    {
+      "id": 0,
+      "name": "SOL/USD: ochrona przed spadkiem ceny",
+      "trigger": "priceBelow"
+    },
+    {
+      "id": 1,
+      "name": "SOL/USD: ochrona przed wzrostem ceny",
+      "trigger": "priceAbove"
+    }
+  ]
+}

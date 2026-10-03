@@ -1,0 +1,28 @@
+{
+  "name": "micro-insurance-solana",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "description": "Parametric micro-insurance on Solana: Anchor program and setup scripts",
+  "scripts": {
+    "build": "anchor build",
+    "setup": "tsx scripts/setup.ts",
+    "check": "tsx scripts/check.ts",
+    "feed:local": "tsx scripts/local-feed.ts",
+    "keeper": "tsx scripts/keeper.ts",
+    
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@anchor-lang/core": "^1.1.2",
+    "bn.js": "^5.2.3",
+    "@solana/spl-token": "^0.4.9",
+    "@solana/web3.js": "1.99.0"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.6",
+    "@types/node": "^22.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.3"
+  }
+}

@@ -1,0 +1,19 @@
+node_modules
+dist
+target
+.anchor
+test-ledger
+.surfpool
+**/*.rs.bk
+
+# secret keys (deployer, mint keypairs) and the RPC key in app/.env.local
+keys/*.json
+!keys/.gitkeep
+.env
+.env.*
+
+# local backup of an abandoned devnet deployment
+deployment.*.old.json
+
+*.log
+.DS_Store
