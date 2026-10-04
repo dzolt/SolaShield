@@ -11,6 +11,7 @@ keys/*.json
 !keys/.gitkeep
 .env
 .env.*
+!.env.example
 
 # local backup of an abandoned devnet deployment
 deployment.*.old.json

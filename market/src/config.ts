@@ -8,15 +8,20 @@ export { deployment, faucetIdl, idl };
 
 export const IS_DEVNET = deployment.cluster === "devnet";
 
+/** VITE_RPC_URL may be a path such as "/rpc" (a reverse proxy on the same origin keeps the provider key off the page). */
+const rpcFromEnv = import.meta.env.VITE_RPC_URL as string | undefined;
+
 export const RPC_URL: string = IS_DEVNET
-  ? ((import.meta.env.VITE_RPC_URL as string | undefined) ?? "https://api.devnet.solana.com")
+  ? (rpcFromEnv ? new URL(rpcFromEnv, window.location.origin).toString() : "https://api.devnet.solana.com")
   : "http://127.0.0.1:8899";
 
 /**
- * Deals created before this unix time are hidden (VITE_MARKET_SINCE). Accounts on a chain cannot be deleted, so this is
- * how a clean market is shown after test runs; the old deals stay visible in the Explorer.
+ * Deals created before this unix time are hidden. Accounts on a chain cannot be deleted, so this is how a clean market
+ * is shown after test runs; the old deals stay visible in the Explorer. The default hides the development test runs
+ * (a clone gets a clean market); VITE_MARKET_SINCE overrides it, and 0 shows everything. Not needed after a fresh deployment.
  */
-export const MARKET_SINCE = Number((import.meta.env.VITE_MARKET_SINCE as string | undefined) ?? 0);
+const DEFAULT_MARKET_SINCE = 1791101452;
+export const MARKET_SINCE = Number((import.meta.env.VITE_MARKET_SINCE as string | undefined) ?? DEFAULT_MARKET_SINCE);
 
 /** The attestor reads Steam and signs what it saw (npm run attestor). */
 export const ATTESTOR_URL: string = (import.meta.env.VITE_ATTESTOR_URL as string | undefined) ?? "http://localhost:8787";

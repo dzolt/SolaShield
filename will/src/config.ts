@@ -8,8 +8,11 @@ export { deployment, faucetIdl, idl };
 
 export const IS_DEVNET = deployment.cluster === "devnet";
 
+/** VITE_RPC_URL may be a path such as "/rpc" (a reverse proxy on the same origin keeps the provider key off the page). */
+const rpcFromEnv = import.meta.env.VITE_RPC_URL as string | undefined;
+
 export const RPC_URL: string = IS_DEVNET
-  ? ((import.meta.env.VITE_RPC_URL as string | undefined) ?? "https://api.devnet.solana.com")
+  ? (rpcFromEnv ? new URL(rpcFromEnv, window.location.origin).toString() : "https://api.devnet.solana.com")
   : "http://127.0.0.1:8899";
 
 export const PROGRAM_ID = new PublicKey(deployment.programId);

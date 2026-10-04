@@ -1,14 +1,17 @@
 // Read-only access to ProofSwap deals. The attestor never signs transactions, only messages.
 import * as anchor from "@anchor-lang/core";
 import { Connection, Keypair, PublicKey, SYSVAR_CLOCK_PUBKEY } from "@solana/web3.js";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { clusterFromEnv, KEYS_DIR, loadKeypair, ROOT, rpcUrl } from "../scripts/lib/env.ts";
 
 export const cluster = clusterFromEnv();
 export const connection = new Connection(rpcUrl(cluster), "confirmed");
 
-const idl = JSON.parse(readFileSync(join(ROOT, "target", "idl", "proofswap.json"), "utf8")) as anchor.Idl;
+// `anchor build` writes the IDL to target/ (git-ignored); a fresh clone uses the copy the web app ships with.
+const builtIdl = join(ROOT, "target", "idl", "proofswap.json");
+const shippedIdl = join(ROOT, "market", "src", "generated", "proofswap.json");
+const idl = JSON.parse(readFileSync(existsSync(builtIdl) ? builtIdl : shippedIdl, "utf8")) as anchor.Idl;
 const provider = new anchor.AnchorProvider(connection, new anchor.Wallet(Keypair.generate()), { commitment: "confirmed" });
 export const program = new anchor.Program(idl, provider);
 export const attestorKey = loadKeypair(join(KEYS_DIR, "attestor.json"));

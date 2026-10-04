@@ -1,0 +1,77 @@
+# One self-contained stack: nothing here publishes a host port, so it cannot collide with other services on the VPS.
+# The only way in is the two Cloudflare tunnels, which dial out from their containers.
+name: proofswap-demo
+
+services:
+  attestor:
+    build:
+      context: ./attestor-image
+    image: proofswap-demo-attestor
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      CLUSTER: devnet
+      ATTESTOR_PORT: "8787"
+    volumes:
+      - ./secrets/attestor.json:/app/keys/attestor.json:ro
+      - sim-data:/app/attestor/data
+    read_only: true
+    tmpfs:
+      - /tmp
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 384m
+    cpus: 0.5
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8787/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  web:
+    image: nginx:1-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      # envsubst fills only this variable in the nginx templates, so nginx's own $variables stay intact.
+      NGINX_ENVSUBST_FILTER: RPC_URL
+    volumes:
+      - ./site/market:/srv/market:ro
+      - ./site/will:/srv/will:ro
+      - ./nginx/templates:/etc/nginx/templates:ro
+    depends_on:
+      - attestor
+    cap_drop: [ALL]
+    cap_add: [CHOWN, SETUID, SETGID, DAC_OVERRIDE]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 64m
+    cpus: 0.5
+
+  tunnel-market:
+    image: cloudflare/cloudflared:2026.9.3
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://web:8081
+    depends_on:
+      - web
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 96m
+    cpus: 0.25
+
+  tunnel-will:
+    image: cloudflare/cloudflared:2026.9.3
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://web:8082
+    depends_on:
+      - web
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 96m
+    cpus: 0.25
+
+volumes:
+  sim-data:

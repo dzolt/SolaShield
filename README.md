@@ -58,23 +58,51 @@ Uczciwie: w MVP atestator to jeden klucz, któremu program ufa. Może odmówić 
 
 ## Uruchomienie
 
-Wymagania: Docker (Anchor, Solana, Surfpool w `Dockerfile`), Node 22+.
+Wymagania: Node 22+ i przeglądarka z portfelem Phantom. Oba programy są już wdrożone na devnecie (adresy niżej), więc niczego nie trzeba budować ani wdrażać.
+
+**1. Phantom na devnecie.** Ustawienia → Developer Settings → Testnet Mode → Solana Devnet. Do opłat sieci wystarczy ok. 0,05 SOL devnetu ([faucet.solana.com](https://faucet.solana.com)). Tokeny tUSDC do płacenia daje przycisk „Odbierz 1000 testowych tUSDC” w aplikacji.
+
+**2. Instalacja.**
 
 ```bash
-npm install && (cd market && npm install)
-
-# devnet (program już wdrożony, adresy niżej)
-export CLUSTER=devnet RPC_URL=<adres RPC devnetu>
-npm run attestor                      # atestator + symulator Steama na http://localhost:8787
-cd market && npm run dev              # aplikacja na http://localhost:5176 (VITE_RPC_URL w market/.env.local)
-
-# test dymny całego przepływu (atestator musi działać)
-npm run ps:check
+git clone <adres tego repozytorium> && cd <katalog>
+npm install && (cd market && npm install) && (cd will && npm install)
 ```
 
-Lokalnie: walidator Surfpool w kontenerze, `solana program deploy target/deploy/proofswap.so ...`, potem `CLUSTER=localnet npm run ps:setup` i to samo co wyżej z `CLUSTER=localnet`.
+**3. Ostatnia Wola Sola** (sam frontend, bez serwera):
 
-**Phantom:** Ustawienia → Developer Settings → Testnet Mode → Solana Devnet. W aplikacji przycisk „Odbierz testowe tUSDC” daje tokeny do płacenia.
+```bash
+cd will && npm run dev        # http://localhost:5177
+```
+
+**4. ProofSwap** (frontend i atestator):
+
+```bash
+export CLUSTER=devnet RPC_URL=<adres RPC devnetu>
+npm run attestor              # atestator + symulator Steama: http://localhost:8787
+cd market && npm run dev      # http://localhost:5176  (?role=seller albo ?role=buyer otwiera od razu dany widok)
+```
+
+Atestator podpisuje kluczem z `keys/attestor.json`. To klucz demo tylko na devnecie i nie ma go w repozytorium (`keys/*.json` jest w `.gitignore`). Bez niego można uruchomić Ostatnią Wolę Sola oraz oglądać rynek ProofSwap; zapłata i dostawa wymagają podpisu atestatora (instancja na devnecie, którą uruchamiamy my).
+
+**Konfiguracja (wszystko opcjonalne).** Żadna zmienna nie jest wymagana. Zalecany jest tylko własny RPC, bo publiczny RPC devnetu często odpowiada błędem 429:
+
+```bash
+cp market/.env.example market/.env.local    # i odkomentuj VITE_RPC_URL=<adres RPC, np. bezpłatny klucz Helius>
+cp will/.env.example will/.env.local        # to samo dla Ostatniej Woli Sola
+```
+
+Atestator nie czyta plików `.env`, tylko zmiennych powłoki: `export RPC_URL=<adres RPC>` przed `npm run attestor` (domyślnie publiczny RPC). Pozostałe zmienne z `.env.example` (`VITE_ATTESTOR_URL`, `VITE_MARKET_SINCE`) są potrzebne tylko wtedy, gdy atestator działa pod innym adresem albo chcesz zobaczyć ogłoszenia testowe z czasu budowy (`VITE_MARKET_SINCE=0`).
+
+### Scenariusz testowy (dwa konta Phantom, np. dwa profile Chrome)
+
+**ProofSwap.** Okno 1: `?role=seller`, „Odbierz tUSDC”, „Wczytaj inventory”, wybierz skina, „Wystaw i potwierdź w Steam”. Okno 2: `?role=buyer`, „Odbierz tUSDC”, wybierz ogłoszenie, „Kup za…”. W oknie 1: w „Symulatorze Steam” przy skinie „Wyślij kupującemu”, potem „Sprawdź w Steam, czy skin dotarł”. Po oknie cofnięcia (w demo 1 min 30 s + 15 s) sprzedający klika „Wypłać mi”.
+
+**Ostatnia Wola Sola.** Konto 1 („Założyciel sejfu”): „Odbierz tUSDC”, „Załóż sejf”, „Wpłać”, dodaj spadkobiercę (adres konta 2) i „Zapisz spadkobierców”. Nic nie rób przez 2 min (cisza) i 1 min (procedura). Konto 2 („Spadkobierca”): „Uruchom wypłatę”, potem „Wypłać udział”.
+
+Test dymny całego przepływu ProofSwap (wymaga klucza wdrożeniowego): `npm run ps:check`.
+
+Lokalnie bez devnetu: walidator Surfpool w kontenerze (`Dockerfile`), `solana program deploy target/deploy/proofswap.so ...`, potem `CLUSTER=localnet npm run ps:setup` i to samo co wyżej z `CLUSTER=localnet`.
 
 ## Adresy na devnecie
 
