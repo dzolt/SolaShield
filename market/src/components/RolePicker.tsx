@@ -1,3 +1,5 @@
+import type { PublicKey } from "@solana/web3.js";
+import { shortAddress } from "../format";
 import type { Role } from "../roles";
 
 interface RoleInfo {
@@ -62,12 +64,13 @@ export function RolePicker({ onPick }: { readonly onPick: (role: Role) => void }
   );
 }
 
-export function RoleBar({ role, onBack }: { readonly role: Role; readonly onBack: () => void }) {
+export function RoleBar({ role, owner, onBack }: { readonly role: Role; readonly owner: PublicKey | undefined; readonly onBack: () => void }) {
   const info = ROLE_INFO[role];
   return (
     <div className="row between role-bar">
       <span>
         <span className="role-icon small-icon">{info.icon}</span> <b>{info.title}</b>
+        <span className="muted small"> · {owner ? `konto ${shortAddress(owner)}` : "portfel niepołączony"}</span>
       </span>
       <button className="chip" onClick={onBack}>
         ← zmień rolę

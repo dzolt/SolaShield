@@ -133,6 +133,11 @@ export function DealPanel({ role, deal, now, owner, runner, proofs, look, onAtte
         <Progress fraction={(now - deal.deliveredAt) / Math.max(1, end - deal.deliveredAt)} tone={now > end ? undefined : "warn"} />
       ) : null}
 
+      {owner && sellerView && !isSeller ? (
+        <p className="banner">
+          To ogłoszenie należy do konta {shortAddress(deal.seller)}, a jesteś połączony jako {shortAddress(owner)}. Przełącz konto w Phantomie, żeby wykonać kroki sprzedającego.
+        </p>
+      ) : null}
       {!owner ? <p className="hint">Połącz portfel, żeby wykonać kolejny krok. Każdy krok może wykonać każdy: liczy się dowód, nie to, kto go wysyła.</p> : null}
 
       <div className="actions">

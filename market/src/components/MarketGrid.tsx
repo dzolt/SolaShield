@@ -1,7 +1,7 @@
 import type { PublicKey } from "@solana/web3.js";
 import { useState } from "react";
 import type { Deal } from "../data";
-import { formatUsdc } from "../format";
+import { formatUsdc, shortAddress } from "../format";
 import type { DealFilter } from "../roles";
 import { dealLabel } from "../status";
 import { Badge, Card } from "../ui";
@@ -36,7 +36,16 @@ export function MarketGrid({ title, filters, deals, now, owner, selected, iconFo
       }
     >
       {shown.length === 0 ? (
-        <p className="muted">{filter?.empty ?? "Nic tu jeszcze nie ma."}</p>
+        <div className="stack">
+          <p className="muted">{filter?.empty ?? "Nic tu jeszcze nie ma."}</p>
+          {filter?.byAccount ? (
+            <p className="muted small">
+              {owner
+                ? `Pokazuję transakcje konta ${shortAddress(owner)}. Jeśli wystawiałeś lub kupowałeś z innego konta, przełącz je w Phantomie.`
+                : "Połącz portfel, żeby zobaczyć swoje transakcje."}
+            </p>
+          ) : null}
+        </div>
       ) : (
         <div className="tiles">
           {shown.map((deal) => {

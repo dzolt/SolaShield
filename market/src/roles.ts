@@ -23,6 +23,8 @@ export interface DealFilter {
   readonly id: string;
   readonly label: string;
   readonly empty: string;
+  /** The result depends on which account is connected (so an empty list may just mean the wrong account). */
+  readonly byAccount?: boolean;
   readonly test: (deal: Deal, owner: PublicKey | undefined) => boolean;
 }
 
@@ -34,10 +36,11 @@ export const SELLER_FILTERS: readonly DealFilter[] = [
   {
     id: "active",
     label: "Aktywne",
+    byAccount: true,
     empty: "Nie masz jeszcze ogłoszeń. Wystaw skina w zakładce „Wystaw skina”.",
     test: (deal, owner) => soldBy(deal, owner) && !finished(deal),
   },
-  { id: "done", label: "Zakończone", empty: "Zakończone transakcje pojawią się tutaj.", test: (deal, owner) => soldBy(deal, owner) && finished(deal) },
+  { id: "done", label: "Zakończone", empty: "Zakończone transakcje pojawią się tutaj.", byAccount: true, test: (deal, owner) => soldBy(deal, owner) && finished(deal) },
 ];
 
 export const BUYER_FILTERS: readonly DealFilter[] = [
@@ -47,6 +50,6 @@ export const BUYER_FILTERS: readonly DealFilter[] = [
     empty: "Nikt jeszcze nic nie wystawił. Poproś sprzedającego albo wejdź w widok sprzedającego i wystaw skina.",
     test: (deal) => deal.status === "listed" && deal.listingVerified,
   },
-  { id: "mine", label: "Moje zakupy", empty: "Jeszcze nic nie kupiłeś.", test: boughtBy },
+  { id: "mine", label: "Moje zakupy", empty: "Jeszcze nic nie kupiłeś.", byAccount: true, test: boughtBy },
   { id: "all", label: "Wszystkie", empty: "Nic tu jeszcze nie ma.", test: () => true },
 ];

@@ -133,7 +133,7 @@ export function App() {
         </>
       ) : (
         <>
-          <RoleBar role={role} onBack={() => pick(undefined)} />
+          <RoleBar role={role} owner={owner} onBack={() => pick(undefined)} />
           <div className="layout">
             <div className="stack">
               {role === "seller" ? (
@@ -183,30 +183,32 @@ export function App() {
             />
           </div>
 
-          <SteamSimulator
-            accounts={sim.data}
-            error={sim.error}
-            deal={deal}
-            busy={runner.busy}
-            onMove={(from, to, assetid) =>
-              void runner.run(async () => {
-                const moved = await simMove(from, to, assetid);
-                return { message: `Wymiana w symulatorze wykonana. Przedmiot dostał nowe ID: ${moved.newAssetId}.` };
-              })
-            }
-            onPrivacy={(steamId, isPrivate) =>
-              void runner.run(async () => {
-                await simPrivacy(steamId, isPrivate);
-                return { message: isPrivate ? "Inventory ukryte." : "Inventory znowu publiczne." };
-              })
-            }
-            onReset={() =>
-              void runner.run(async () => {
-                await simReset();
-                return { message: "Przywrócono inventory demo." };
-              })
-            }
-          />
+          {role === "seller" ? (
+            <SteamSimulator
+              accounts={sim.data}
+              error={sim.error}
+              deal={deal}
+              busy={runner.busy}
+              onMove={(from, to, assetid) =>
+                void runner.run(async () => {
+                  const moved = await simMove(from, to, assetid);
+                  return { message: `Wymiana w symulatorze wykonana. Przedmiot dostał nowe ID: ${moved.newAssetId}.` };
+                })
+              }
+              onPrivacy={(steamId, isPrivate) =>
+                void runner.run(async () => {
+                  await simPrivacy(steamId, isPrivate);
+                  return { message: isPrivate ? "Inventory ukryte." : "Inventory znowu publiczne." };
+                })
+              }
+              onReset={() =>
+                void runner.run(async () => {
+                  await simReset();
+                  return { message: "Przywrócono inventory demo." };
+                })
+              }
+            />
+          ) : null}
         </>
       )}
       <TxStatus busy={runner.busy} state={runner.phase} />
