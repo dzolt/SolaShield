@@ -391,6 +391,14 @@
   box-shadow: var(--shadow-xs), 0 0 0 1px var(--border);
 }
 
+@media (max-width: 480px) {
+  .seg {
+    padding: 0 12px;
+    gap: 6px;
+    font-size: 0.84rem;
+  }
+}
+
 .seg-count {
   min-width: 20px;
   padding: 1px 6px;
@@ -765,8 +773,11 @@
 
 .party a,
 .party .party-name {
+  overflow: hidden;
   font-weight: 600;
   text-decoration: none;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text);
 }
 

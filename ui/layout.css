@@ -71,6 +71,7 @@
 }
 
 .wallet-chip {
+  white-space: nowrap;
   display: inline-flex;
   align-items: center;
   gap: 10px;
@@ -224,6 +225,7 @@
 }
 
 .hero h1 em {
+  white-space: nowrap;
   font-style: normal;
   background: var(--brand-gradient);
   -webkit-background-clip: text;
@@ -398,9 +400,15 @@
 
   .action-bar .action-fields {
     width: 100%;
+    flex-wrap: nowrap;
   }
 
   .action-bar .action-fields .field {
+    flex: 0 0 116px;
+  }
+
+  .action-bar .action-fields .btn {
     flex: 1;
+    padding: 0 14px;
   }
 }

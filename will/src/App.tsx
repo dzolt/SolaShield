@@ -1,46 +1,51 @@
 import { useAnchorWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useMemo, useState } from "react";
-import {
-  cancelWill, checkIn, claimShare, claimTokens, createWill, deposit, lockHeirs, setGuardian, setHeirs, triggerDistribution, veto, withdraw,
-  type HeirDraft,
-} from "./actions";
-import { CreatePanel } from "./components/CreatePanel";
-import { Header } from "./components/Header";
-import { HowItWorks } from "./components/HowItWorks";
-import { RoleBar, RolePicker } from "./components/RolePicker";
-import { WillList } from "./components/WillList";
-import { WillPanel } from "./components/WillPanel";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { cancelWill, checkIn, claimShare, claimTokens, createWill, deposit, lockHeirs, setGuardian, setHeirs, triggerDistribution, veto, withdraw, type HeirDraft } from "./actions";
+import { GuardianView } from "./components/guardian/GuardianView";
+import { HeirView } from "./components/heir/HeirView";
+import { Footer } from "./components/layout/Footer";
+import { Landing } from "./components/layout/Landing";
+import { TopBar } from "./components/layout/TopBar";
+import { OwnerView } from "./components/owner/OwnerView";
 import { explorerTx } from "./config";
 import { loadSnapshot, rolesOf, type Role, type Will } from "./data";
 import { useActionRunner, useChainClock, usePoll, useToasts, type ActionOutcome } from "./hooks";
 import { makeProgram } from "./program";
-import { Card, Toasts, TxStatus } from "./ui";
+import { roleFromUrl, willFromUrl, writeRoleToUrl, writeWillToUrl } from "./roles";
+import { Toasts, TxStatus } from "./ui";
 
-const LIST_TITLES: Readonly<Record<Role, string>> = {
-  owner: "Moje sejfy",
-  guardian: "Sejfy, w których jestem strażnikiem",
-  heir: "Testamenty, w których jestem spadkobiercą",
-};
-
-const EMPTY_TEXT: Readonly<Record<Role, string>> = {
-  owner: "Nie masz jeszcze sejfu. Załóż pierwszy.",
-  guardian: "Nikt jeszcze nie wyznaczył tego portfela na strażnika. Właściciel ustawia go w swoim sejfie.",
-  heir: "Nikt jeszcze nie wpisał tego portfela do testamentu. Właściciel robi to w edytorze spadkobierców.",
-};
+const ROLES: readonly Role[] = ["owner", "guardian", "heir"];
 
 export function App() {
   const wallet = useAnchorWallet();
+  const { setVisible } = useWalletModal();
   const me = wallet?.publicKey;
   const program = useMemo(() => makeProgram(wallet), [wallet]);
   const snapshot = usePoll(() => loadSnapshot(program, me));
   const now = useChainClock(snapshot.data?.now);
   const toast = useToasts();
   const runner = useActionRunner(toast, snapshot.reload, explorerTx);
-  const [role, setRole] = useState<Role | undefined>(undefined);
-  const [selected, setSelected] = useState<string | undefined>(undefined);
+  const [role, setRole] = useState<Role | undefined>(roleFromUrl);
+  const [selected, setSelected] = useState<string | undefined>(willFromUrl);
 
-  const mine = (snapshot.data?.wills ?? []).filter((w) => (role ? rolesOf(w, me).includes(role) : false));
-  const will = mine.find((w) => w.address.toBase58() === selected);
+  const wills = snapshot.data?.wills ?? [];
+  const counts = useMemo(
+    () => Object.fromEntries(ROLES.map((r) => [r, wills.filter((w) => rolesOf(w, me).includes(r)).length])) as Record<Role, number>,
+    [wills, me],
+  );
+  const mine = wills.filter((w) => (role ? rolesOf(w, me).includes(role) : false));
+  // The chosen will, or the newest one in this role: nobody has to click a list to see their vault.
+  const will = mine.find((w) => w.address.toBase58() === selected) ?? mine[0];
+  const willAddress = will?.address.toBase58();
+
+  useEffect(() => writeWillToUrl(willAddress), [willAddress]);
+
+  // Show the account's balances and wills right after connecting, not at the next poll.
+  const reloadSnapshot = snapshot.reload;
+  useEffect(() => {
+    void reloadSnapshot();
+  }, [me, reloadSnapshot]);
 
   const needWallet = () => {
     if (!wallet || !me) throw new Error("Połącz portfel.");
@@ -65,41 +70,43 @@ export function App() {
     });
 
   const pick = (next: Role | undefined) => {
+    writeRoleToUrl(next);
     setRole(next);
     setSelected(undefined);
   };
 
+  const shared = {
+    wills: mine,
+    will,
+    onSelect: setSelected,
+    now,
+    me,
+    runner,
+    onConnect: () => setVisible(true),
+  };
+
   return (
-    <div className="app">
-      <Header owner={me} wallet={snapshot.data?.wallet} runner={runner} onClaim={() => void runner.run(() => claimTokens(needWallet().wallet))} />
-      {snapshot.error ? <p className="banner">Nie udało się odczytać łańcucha: {snapshot.error}</p> : null}
+    <>
+      <TopBar
+        role={role}
+        onRole={pick}
+        onHome={() => pick(undefined)}
+        owner={me}
+        wallet={snapshot.data?.wallet}
+        busy={runner.busy}
+        onClaim={() => void runner.run(() => claimTokens(needWallet().wallet))}
+        counts={counts}
+      />
 
       {!role ? (
-        <>
-          <RolePicker onPick={pick} />
-          <HowItWorks />
-        </>
+        <Landing onPick={pick} />
       ) : (
         <>
-          <RoleBar role={role} onBack={() => pick(undefined)} />
-          {!me ? <p className="hint">Połącz portfel (przycisk w prawym górnym rogu), żeby zobaczyć swoje sejfy i wykonywać akcje.</p> : null}
-          <div className="layout">
-            <div className="stack">
-              {role === "owner" ? <CreatePanel owner={me} busy={runner.busy} onCreate={onCreate} /> : null}
-              {me ? (
-                <WillList title={LIST_TITLES[role]} wills={mine} now={now} me={me} selected={selected} empty={EMPTY_TEXT[role]} onSelect={setSelected} />
-              ) : (
-                <Card title={LIST_TITLES[role]}>
-                  <p className="muted">Po podłączeniu portfela pojawi się tu lista.</p>
-                </Card>
-              )}
-            </div>
-            <WillPanel
-              will={will}
-              now={now}
-              me={me}
-              role={role}
-              runner={runner}
+          {role === "owner" ? (
+            <OwnerView
+              {...shared}
+              walletTokens={snapshot.data?.wallet?.tokens}
+              onCreate={onCreate}
               onCheckIn={() => withWill((who, w) => checkIn(program, who, w))}
               onDeposit={(amount) => withWill((who, w) => deposit(program, who, w, amount))}
               onWithdraw={(amount) => withWill((who, w) => withdraw(program, who, w, amount))}
@@ -113,15 +120,25 @@ export function App() {
               }
               onSaveHeirs={(drafts: readonly HeirDraft[]) => withWill((who, w) => setHeirs(program, who, w, drafts))}
               onLockHeirs={() => withWill((who, w) => lockHeirs(program, who, w))}
-              onVeto={() => withWill((who, w) => veto(program, who, w))}
+              onClaimShare={(index) => withWill((who, w) => claimShare(program, who, w, index))}
+            />
+          ) : null}
+          {role === "guardian" ? <GuardianView {...shared} onVeto={() => withWill((who, w) => veto(program, who, w))} /> : null}
+          {role === "heir" ? (
+            <HeirView
+              {...shared}
               onTrigger={() => withWill((who, w) => triggerDistribution(program, who, w))}
               onClaimShare={(index) => withWill((who, w) => claimShare(program, who, w, index))}
             />
+          ) : null}
+          <div className="page page-footer">
+            <Footer />
           </div>
         </>
       )}
+
       <TxStatus busy={runner.busy} state={runner.phase} />
       <Toasts toasts={toast.toasts} dismiss={toast.dismiss} />
-    </div>
+    </>
   );
 }

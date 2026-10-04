@@ -69,6 +69,11 @@ export function App() {
 
   useEffect(() => writeDealToUrl(selected), [selected]);
 
+  // Show the account's balances right after connecting, not at the next poll.
+  useEffect(() => {
+    void reloadSnapshot();
+  }, [owner, reloadSnapshot]);
+
   const looks = useMemo(() => {
     const map: Record<string, ItemLook> = { ...extraLooks };
     for (const account of sim.data ?? []) for (const item of account.items) map[item.name] = { icon: item.icon, color: item.color };

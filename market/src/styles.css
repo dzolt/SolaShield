@@ -151,7 +151,13 @@
   border-top: 1px solid var(--border);
 }
 
+.item-foot .party {
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
 .price {
+  flex: none;
   display: inline-flex;
   align-items: baseline;
   gap: 5px;

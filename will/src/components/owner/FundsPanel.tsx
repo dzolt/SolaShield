@@ -1,5 +1,5 @@
 import { ArrowDownToLine, ArrowUpFromLine } from "lucide-react";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { formatPrice, parseUsdc, toInputAmount } from "../../format";
 import { Button, Card, Field } from "../../ui";
 
@@ -26,7 +26,7 @@ interface AmountCardProps {
   readonly title: string;
   readonly hint: string;
   readonly cta: string;
-  readonly icon: React.ReactNode;
+  readonly icon: ReactNode;
   readonly busy: boolean;
   readonly primary: boolean;
   readonly full?: bigint;
