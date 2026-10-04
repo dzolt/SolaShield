@@ -1,0 +1,1451 @@
+{
+  "address": "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R",
+  "metadata": {
+    "name": "micro_insurance",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Parametric peer-to-peer micro-insurance: terms and payouts enforced by the program, no insurer"
+  },
+  "instructions": [
+    {
+      "name": "add_product",
+      "discriminator": [
+        0,
+        219,
+        137,
+        36,
+        105,
+        180,
+        164,
+        93
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "product",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  100,
+                  117,
+                  99,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "pool.product_count",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "AddProductArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "buy_policy",
+      "discriminator": [
+        0,
+        59,
+        201,
+        101,
+        183,
+        3,
+        41,
+        24
+      ],
+      "accounts": [
+        {
+          "name": "holder",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "product",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  100,
+                  117,
+                  99,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "arg",
+                "path": "args.product_id"
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "pool.policy_count",
+                "account": "Pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_update",
+          "docs": [
+            "The Pyth price account of the product's feed. The program reads the reference price from it, not the buyer."
+          ]
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "holder_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "BuyPolicyArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "deposit",
+      "discriminator": [
+        242,
+        35,
+        198,
+        137,
+        82,
+        225,
+        242,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "faucet",
+      "discriminator": [
+        0,
+        98,
+        59,
+        30,
+        144,
+        142,
+        113,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint",
+          "docs": [
+            "The test token (tUSDC). Its mint authority is this program's PDA, which is what makes the faucet open."
+          ],
+          "writable": true
+        },
+        {
+          "name": "mint_authority",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  109,
+                  105,
+                  110,
+                  116,
+                  45,
+                  97,
+                  117,
+                  116,
+                  104,
+                  111,
+                  114,
+                  105,
+                  116,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "user_ata",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "account",
+                "path": "token_program"
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ],
+            "program": {
+              "kind": "const",
+              "value": [
+                140,
+                151,
+                37,
+                143,
+                78,
+                36,
+                137,
+                241,
+                187,
+                61,
+                16,
+                41,
+                20,
+                142,
+                13,
+                131,
+                11,
+                90,
+                19,
+                153,
+                218,
+                255,
+                16,
+                132,
+                4,
+                142,
+                123,
+                216,
+                219,
+                233,
+                248,
+                89
+              ]
+            }
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "associated_token_program",
+          "address": "ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "initialize_pool",
+      "discriminator": [
+        95,
+        180,
+        10,
+        172,
+        84,
+        174,
+        232,
+        40
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "mint"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "The pool's only token account. Its authority is the pool PDA, so no key can move funds out of it."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "lockup_seconds",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "settle_price",
+      "discriminator": [
+        99,
+        153,
+        132,
+        136,
+        255,
+        221,
+        148,
+        13
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "docs": [
+            "Anyone may settle: the outcome depends only on the Pyth price, never on who calls."
+          ],
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "relations": [
+            "policy"
+          ]
+        },
+        {
+          "name": "product",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  114,
+                  111,
+                  100,
+                  117,
+                  99,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "policy.product_id",
+                "account": "Policy"
+              }
+            ]
+          }
+        },
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "policy.id",
+                "account": "Policy"
+              }
+            ]
+          }
+        },
+        {
+          "name": "price_update",
+          "docs": [
+            "A price update account posted by the Pyth receiver (the caller posts it in the same transaction)."
+          ]
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "holder_ata",
+          "docs": [
+            "The payout always goes to the policy holder's token account, whoever submits the transaction."
+          ],
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "void_policy",
+      "discriminator": [
+        51,
+        30,
+        141,
+        210,
+        61,
+        89,
+        224,
+        111
+      ],
+      "accounts": [
+        {
+          "name": "payer",
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "relations": [
+            "policy"
+          ]
+        },
+        {
+          "name": "policy",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  108,
+                  105,
+                  99,
+                  121
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "policy.id",
+                "account": "Policy"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "holder_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw",
+      "discriminator": [
+        183,
+        18,
+        70,
+        156,
+        148,
+        109,
+        161,
+        34
+      ],
+      "accounts": [
+        {
+          "name": "owner",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "position"
+          ]
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "position",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  108,
+                  112
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "owner"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
+          "name": "owner_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "pool"
+          ]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": [
+        {
+          "name": "shares",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "LpPosition",
+      "discriminator": [
+        105,
+        241,
+        37,
+        200,
+        224,
+        2,
+        252,
+        90
+      ]
+    },
+    {
+      "name": "Policy",
+      "discriminator": [
+        222,
+        135,
+        7,
+        163,
+        235,
+        177,
+        33,
+        68
+      ]
+    },
+    {
+      "name": "Pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
+    },
+    {
+      "name": "Product",
+      "discriminator": [
+        102,
+        76,
+        55,
+        251,
+        38,
+        73,
+        224,
+        229
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "InvalidProduct",
+      "msg": "Invalid product parameters"
+    },
+    {
+      "code": 6001,
+      "name": "ZeroAmount",
+      "msg": "Amount must be greater than zero"
+    },
+    {
+      "code": 6002,
+      "name": "InsufficientShares",
+      "msg": "Not enough pool shares"
+    },
+    {
+      "code": 6003,
+      "name": "CapitalReserved",
+      "msg": "This capital backs active covers and cannot be withdrawn now"
+    },
+    {
+      "code": 6004,
+      "name": "InsufficientCapacity",
+      "msg": "The pool has too little capital to cover this payout"
+    },
+    {
+      "code": 6005,
+      "name": "CoverTooLarge",
+      "msg": "One cover may promise at most 20% of the pool's capital"
+    },
+    {
+      "code": 6006,
+      "name": "InvalidThreshold",
+      "msg": "The protected move must be between 0% and 90%"
+    },
+    {
+      "code": 6007,
+      "name": "TooLateToInsure",
+      "msg": "Too late to buy: the event is sooner than the product's lead time"
+    },
+    {
+      "code": 6008,
+      "name": "PolicyNotActive",
+      "msg": "The cover is not active"
+    },
+    {
+      "code": 6009,
+      "name": "PriceOutsideWindow",
+      "msg": "The price was published outside the observation window of this cover"
+    },
+    {
+      "code": 6010,
+      "name": "PriceNotVerified",
+      "msg": "The price update is not fully verified"
+    },
+    {
+      "code": 6011,
+      "name": "WrongPriceFeed",
+      "msg": "The price update is for a different feed"
+    },
+    {
+      "code": 6012,
+      "name": "StalePrice",
+      "msg": "The price update is too old or belongs to a different feed"
+    },
+    {
+      "code": 6013,
+      "name": "InvalidPrice",
+      "msg": "Invalid price"
+    },
+    {
+      "code": 6014,
+      "name": "TooEarlyToVoid",
+      "msg": "Too early to void: wait until 7 days after the event"
+    },
+    {
+      "code": 6015,
+      "name": "PoolInsolvent",
+      "msg": "The pool is empty and does not accept deposits"
+    },
+    {
+      "code": 6016,
+      "name": "FaucetLimit",
+      "msg": "The faucet gives at most 10 000 tUSDC at a time"
+    },
+    {
+      "code": 6017,
+      "name": "LiquidityLocked",
+      "msg": "Your deposit is locked: you can withdraw after the lock-up ends"
+    },
+    {
+      "code": 6018,
+      "name": "InvalidLockup",
+      "msg": "The lock-up must be between 0 and 30 days"
+    },
+    {
+      "code": 6019,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "AddProductArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "trigger",
+            "type": {
+              "defined": {
+                "name": "Trigger"
+              }
+            }
+          },
+          {
+            "name": "feed_id",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "premium_bps",
+            "type": "u16"
+          },
+          {
+            "name": "min_lead_time",
+            "type": "i64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BuyPolicyArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "product_id",
+            "type": "u32"
+          },
+          {
+            "name": "payout",
+            "type": "u64"
+          },
+          {
+            "name": "expiry",
+            "docs": [
+              "When the cover ends and the price is read (unix seconds)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "threshold_bps",
+            "docs": [
+              "Protected move in basis points (1500 = 15%). The program turns it into a strike using the price it reads itself."
+            ],
+            "type": "u16"
+          }
+        ]
+      }
+    },
+    {
+      "name": "LpPosition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "owner",
+            "type": "pubkey"
+          },
+          {
+            "name": "shares",
+            "type": "u64"
+          },
+          {
+            "name": "unlock_at",
+            "docs": [
+              "Earliest time the provider may withdraw (unix seconds). Every new deposit pushes it back for the whole position."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Policy",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "holder",
+            "type": "pubkey"
+          },
+          {
+            "name": "product_id",
+            "type": "u32"
+          },
+          {
+            "name": "payout",
+            "type": "u64"
+          },
+          {
+            "name": "premium",
+            "type": "u64"
+          },
+          {
+            "name": "expiry",
+            "docs": [
+              "When the cover ends and the price is read (unix seconds)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "reference_price",
+            "docs": [
+              "Pyth price at purchase, read by the program itself: `reference_price` x 10^`price_expo`."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "price_expo",
+            "type": "i32"
+          },
+          {
+            "name": "threshold_bps",
+            "docs": [
+              "Protected move in basis points (e.g. 1500 = 15%)."
+            ],
+            "type": "u16"
+          },
+          {
+            "name": "strike",
+            "docs": [
+              "Trigger level computed by the program from the reference price and the threshold."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "PolicyStatus"
+              }
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PolicyStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "PaidOut"
+          },
+          {
+            "name": "Expired"
+          },
+          {
+            "name": "Voided"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "type": "pubkey"
+          },
+          {
+            "name": "total_assets",
+            "docs": [
+              "Internal accounting of pool funds (not the vault balance, so donations cannot skew the share price)."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "reserved",
+            "docs": [
+              "Sum of payouts of active covers."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "total_shares",
+            "type": "u64"
+          },
+          {
+            "name": "lockup_seconds",
+            "docs": [
+              "After each deposit the provider cannot withdraw for this long (set once at pool creation, never changed)."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "product_count",
+            "type": "u32"
+          },
+          {
+            "name": "policy_count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceFeedMessage",
+      "repr": {
+        "kind": "c"
+      },
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "feed_id",
+            "docs": [
+              "`FeedId` but avoid the type alias because of compatibility issues with Anchor's `idl-build` feature."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "price",
+            "type": "i64"
+          },
+          {
+            "name": "conf",
+            "type": "u64"
+          },
+          {
+            "name": "exponent",
+            "type": "i32"
+          },
+          {
+            "name": "publish_time",
+            "docs": [
+              "The timestamp of this price update in seconds"
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "prev_publish_time",
+            "docs": [
+              "The timestamp of the previous price update. This field is intended to allow users to",
+              "identify the single unique price update for any moment in time:",
+              "for any time t, the unique update is the one such that prev_publish_time < t <= publish_time.",
+              "",
+              "Note that there may not be such an update while we are migrating to the new message-sending logic,",
+              "as some price updates on pythnet may not be sent to other chains (because the message-sending",
+              "logic may not have triggered). We can solve this problem by making the message-sending mandatory",
+              "(which we can do once publishers have migrated over).",
+              "",
+              "Additionally, this field may be equal to publish_time if the message is sent on a slot where",
+              "where the aggregation was unsuccesful. This problem will go away once all publishers have",
+              "migrated over to a recent version of pyth-agent."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "ema_price",
+            "type": "i64"
+          },
+          {
+            "name": "ema_conf",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PriceUpdateV2",
+      "docs": [
+        "A price update account. This account is used by the Pyth Receiver program to store a verified price update from a Pyth price feed.",
+        "It contains:",
+        "- `write_authority`: The write authority for this account. This authority can close this account to reclaim rent or update the account to contain a different price update.",
+        "- `verification_level`: The [`VerificationLevel`] of this price update. This represents how many Wormhole guardian signatures have been verified for this price update.",
+        "- `price_message`: The actual price update.",
+        "- `posted_slot`: The slot at which this price update was posted."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "write_authority",
+            "type": "pubkey"
+          },
+          {
+            "name": "verification_level",
+            "type": {
+              "defined": {
+                "name": "VerificationLevel"
+              }
+            }
+          },
+          {
+            "name": "price_message",
+            "type": {
+              "defined": {
+                "name": "PriceFeedMessage"
+              }
+            }
+          },
+          {
+            "name": "posted_slot",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Product",
+      "docs": [
+        "Products are immutable once created: the admin can add new ones but never edit one that covers depend on."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool",
+            "type": "pubkey"
+          },
+          {
+            "name": "id",
+            "type": "u32"
+          },
+          {
+            "name": "name",
+            "type": "string"
+          },
+          {
+            "name": "trigger",
+            "type": {
+              "defined": {
+                "name": "Trigger"
+              }
+            }
+          },
+          {
+            "name": "feed_id",
+            "docs": [
+              "Pyth price feed id."
+            ],
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "premium_bps",
+            "type": "u16"
+          },
+          {
+            "name": "min_lead_time",
+            "docs": [
+              "A cover must be bought at least this many seconds before its expiry."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Trigger",
+      "docs": [
+        "Which move of the Pyth price a cover protects against."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "PriceBelow"
+          },
+          {
+            "name": "PriceAbove"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VerificationLevel",
+      "docs": [
+        "Pyth price updates are bridged to all blockchains via Wormhole.",
+        "Using the price updates on another chain requires verifying the signatures of the Wormhole guardians.",
+        "The usual process is to check the signatures for two thirds of the total number of guardians, but this can be cumbersome on Solana because of the transaction size limits,",
+        "so we also allow for partial verification.",
+        "",
+        "This enum represents how much a price update has been verified:",
+        "- If `Full`, we have verified the signatures for two thirds of the current guardians.",
+        "- If `Partial`, only `num_signatures` guardian signatures have been checked.",
+        "",
+        "# Warning",
+        "Using partially verified price updates is dangerous, as it lowers the threshold of guardians that need to collude to produce a malicious price update."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Partial",
+            "fields": [
+              {
+                "name": "num_signatures",
+                "type": "u8"
+              }
+            ]
+          },
+          {
+            "name": "Full"
+          }
+        ]
+      }
+    }
+  ],
+  "constants": [
+    {
+      "name": "TOKEN_DECIMALS",
+      "type": "u8",
+      "value": "6"
+    }
+  ]
+}

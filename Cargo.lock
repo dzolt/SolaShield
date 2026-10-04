@@ -1326,6 +1326,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "proofswap"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+ "solana-instructions-sysvar 3.0.1",
+]
+
+[[package]]
 name = "pyth-sdk"
 version = "0.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"

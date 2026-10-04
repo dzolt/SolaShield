@@ -10,9 +10,11 @@
     "check": "tsx scripts/check.ts",
     "feed:local": "tsx scripts/local-feed.ts",
     "keeper": "tsx scripts/keeper.ts",
+    "attestor": "tsx attestor/server.ts",
+    "ps:setup": "tsx scripts/proofswap-setup.ts",
+    "ps:check": "tsx scripts/proofswap-check.ts",
     "will:setup": "tsx scripts/will-setup.ts",
     "will:check": "tsx scripts/will-check.ts",
-    
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

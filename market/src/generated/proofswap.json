@@ -1,0 +1,1326 @@
+{
+  "address": "7kWKy3wvsLi37vZ5Cp3YvcrpvAkscHj5mXWopBG2JaZd",
+  "metadata": {
+    "name": "proofswap",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Trustless settlement for CS2 items: the payment is locked on Solana and released by attested Steam inventory state"
+  },
+  "instructions": [
+    {
+      "name": "attest_buyer_hidden",
+      "discriminator": [
+        53,
+        227,
+        171,
+        65,
+        214,
+        76,
+        228,
+        51
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "docs": [
+            "Anyone may submit; the payout target is fixed by the deal, not by the submitter."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seller_ata",
+          "writable": true
+        },
+        {
+          "name": "buyer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "observed_at",
+          "type": "i64"
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "attest_delivery",
+      "discriminator": [
+        244,
+        58,
+        145,
+        25,
+        88,
+        238,
+        153,
+        0
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "docs": [
+            "Anyone may submit an attestation: what counts is the attestor's signature, not who sends it."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "observed_at",
+          "type": "i64"
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "attest_listing",
+      "discriminator": [
+        148,
+        58,
+        139,
+        213,
+        120,
+        146,
+        252,
+        200
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "docs": [
+            "Anyone may submit an attestation: what counts is the attestor's signature, not who sends it."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "observed_at",
+          "type": "i64"
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "attest_reversal",
+      "discriminator": [
+        223,
+        106,
+        251,
+        0,
+        66,
+        236,
+        167,
+        37
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "docs": [
+            "Anyone may submit; the payout target is fixed by the deal, not by the submitter."
+          ],
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seller_ata",
+          "writable": true
+        },
+        {
+          "name": "buyer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "kind",
+          "type": {
+            "defined": {
+              "name": "AttestationKind"
+            }
+          }
+        },
+        {
+          "name": "observed_at",
+          "type": "i64"
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "cancel_listing",
+      "discriminator": [
+        41,
+        183,
+        50,
+        232,
+        230,
+        233,
+        157,
+        70
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "deal"
+          ]
+        },
+        {
+          "name": "deal",
+          "docs": [
+            "A listing nobody has paid for yet can be withdrawn; its rent goes back to the seller."
+          ],
+          "writable": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "create_listing",
+      "discriminator": [
+        18,
+        168,
+        45,
+        24,
+        191,
+        31,
+        117,
+        54
+      ],
+      "accounts": [
+        {
+          "name": "seller",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "config.deal_count",
+                "account": "Config"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "CreateListingArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "finalize",
+      "discriminator": [
+        171,
+        61,
+        218,
+        56,
+        127,
+        115,
+        12,
+        217
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seller_ata",
+          "writable": true
+        },
+        {
+          "name": "buyer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fund",
+      "discriminator": [
+        218,
+        188,
+        111,
+        221,
+        152,
+        113,
+        174,
+        7
+      ],
+      "accounts": [
+        {
+          "name": "buyer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "docs": [
+            "The deal's own vault. Its authority is the deal PDA, so no key, ours included, can move the payment."
+          ],
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "buyer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        },
+        {
+          "name": "instructions",
+          "address": "Sysvar1nstructions1111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "buyer_steam_id",
+          "type": "u64"
+        },
+        {
+          "name": "observed_at",
+          "type": "i64"
+        },
+        {
+          "name": "evidence_hash",
+          "type": {
+            "array": [
+              "u8",
+              32
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "init_config",
+      "discriminator": [
+        23,
+        235,
+        115,
+        232,
+        168,
+        96,
+        1,
+        231
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "mint"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "args",
+          "type": {
+            "defined": {
+              "name": "InitConfigArgs"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "refund",
+      "discriminator": [
+        2,
+        96,
+        183,
+        251,
+        63,
+        208,
+        46,
+        46
+      ],
+      "accounts": [
+        {
+          "name": "submitter",
+          "signer": true
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "deal",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  100,
+                  101,
+                  97,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal.id",
+                "account": "Deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "vault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "deal"
+              }
+            ]
+          }
+        },
+        {
+          "name": "seller_ata",
+          "writable": true
+        },
+        {
+          "name": "buyer_ata",
+          "writable": true
+        },
+        {
+          "name": "mint",
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "token_program"
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    },
+    {
+      "name": "Deal",
+      "discriminator": [
+        125,
+        223,
+        160,
+        234,
+        71,
+        162,
+        182,
+        219
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ZeroPrice",
+      "msg": "The price must be greater than zero"
+    },
+    {
+      "code": 6001,
+      "name": "FieldTooLong",
+      "msg": "The item name or wear is too long"
+    },
+    {
+      "code": 6002,
+      "name": "MissingSteamId",
+      "msg": "A Steam ID is missing"
+    },
+    {
+      "code": 6003,
+      "name": "InvalidWear",
+      "msg": "Only items with a wear rating (float, e.g. 0.1320) are unique and can be listed"
+    },
+    {
+      "code": 6004,
+      "name": "ListingNotVerified",
+      "msg": "Steam has not yet confirmed that the item is in the seller's inventory"
+    },
+    {
+      "code": 6005,
+      "name": "InvalidWindow",
+      "msg": "Each window must be between 1 second and 30 days (grace may be 0)"
+    },
+    {
+      "code": 6006,
+      "name": "WrongStatus",
+      "msg": "The deal is not in the right state for this step"
+    },
+    {
+      "code": 6007,
+      "name": "SameParty",
+      "msg": "The buyer and the seller must be different people and Steam accounts"
+    },
+    {
+      "code": 6008,
+      "name": "NotSeller",
+      "msg": "Only the seller can do this"
+    },
+    {
+      "code": 6009,
+      "name": "MissingAttestation",
+      "msg": "Missing attestation: the previous instruction must be the Ed25519 check of the attestor's signature"
+    },
+    {
+      "code": 6010,
+      "name": "WrongAttestor",
+      "msg": "The attestation was signed by a key that is not the configured attestor"
+    },
+    {
+      "code": 6011,
+      "name": "AttestationMismatch",
+      "msg": "The signed attestation does not match this deal, step, time or evidence"
+    },
+    {
+      "code": 6012,
+      "name": "StaleAttestation",
+      "msg": "The observation is in the future or older than 10 minutes"
+    },
+    {
+      "code": 6013,
+      "name": "OutsideWindow",
+      "msg": "The observation is outside the time window of this step"
+    },
+    {
+      "code": 6014,
+      "name": "WrongAttestationKind",
+      "msg": "This kind of attestation cannot be used for this step"
+    },
+    {
+      "code": 6015,
+      "name": "ProtectionNotOver",
+      "msg": "Too early: the reversal window (protection plus grace) is still open"
+    },
+    {
+      "code": 6016,
+      "name": "DeliveryWindowOpen",
+      "msg": "Too early: the seller still has time to deliver"
+    },
+    {
+      "code": 6017,
+      "name": "MathOverflow",
+      "msg": "Math overflow"
+    }
+  ],
+  "types": [
+    {
+      "name": "AttestationKind",
+      "docs": [
+        "What the attestor saw in Steam. Its number is part of the signed message."
+      ],
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "ListedItemInSellerInventory"
+          },
+          {
+            "name": "DeliveredToBuyer"
+          },
+          {
+            "name": "ReturnedToSeller"
+          },
+          {
+            "name": "SellerInventoryHidden"
+          },
+          {
+            "name": "BuyerInventoryHidden"
+          },
+          {
+            "name": "BuyerInventoryPublic"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "docs": [
+        "Set once at deployment; there is no instruction to change it later."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "attestor",
+            "docs": [
+              "Key of the service that reads Steam and signs what it saw. It states facts; it cannot move money."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "mint",
+            "docs": [
+              "Payment token (tUSDC on devnet)."
+            ],
+            "type": "pubkey"
+          },
+          {
+            "name": "delivery_window",
+            "docs": [
+              "After paying, the buyer waits at most this long for the item."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "protection_period",
+            "docs": [
+              "Steam lets the sender reverse a CS2 trade for 7 days, so the payment waits at least that long after delivery."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "grace_period",
+            "docs": [
+              "Extra time after the protection period to report a reversal before the seller can be paid."
+            ],
+            "type": "i64"
+          },
+          {
+            "name": "deal_count",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CreateListingArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "seller_steam_id",
+            "type": "u64"
+          },
+          {
+            "name": "item_name",
+            "type": "string"
+          },
+          {
+            "name": "wear",
+            "type": "string"
+          },
+          {
+            "name": "pattern",
+            "type": "u32"
+          },
+          {
+            "name": "listed_asset_id",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Deal",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u64"
+          },
+          {
+            "name": "seller",
+            "type": "pubkey"
+          },
+          {
+            "name": "buyer",
+            "type": "pubkey"
+          },
+          {
+            "name": "price",
+            "type": "u64"
+          },
+          {
+            "name": "seller_steam_id",
+            "type": "u64"
+          },
+          {
+            "name": "buyer_steam_id",
+            "type": "u64"
+          },
+          {
+            "name": "item_name",
+            "docs": [
+              "Identity of the exact item. Name, wear and pattern survive a trade; the Steam asset id does not."
+            ],
+            "type": "string"
+          },
+          {
+            "name": "wear",
+            "type": "string"
+          },
+          {
+            "name": "pattern",
+            "type": "u32"
+          },
+          {
+            "name": "listed_asset_id",
+            "docs": [
+              "Asset id in the seller's inventory when listed, for reference only."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "DealStatus"
+              }
+            }
+          },
+          {
+            "name": "listing_verified",
+            "type": "bool"
+          },
+          {
+            "name": "protection_period",
+            "type": "i64"
+          },
+          {
+            "name": "grace_period",
+            "type": "i64"
+          },
+          {
+            "name": "created_at",
+            "type": "i64"
+          },
+          {
+            "name": "funded_at",
+            "type": "i64"
+          },
+          {
+            "name": "delivery_deadline",
+            "type": "i64"
+          },
+          {
+            "name": "delivered_at",
+            "type": "i64"
+          },
+          {
+            "name": "protection_end",
+            "type": "i64"
+          },
+          {
+            "name": "settled_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_kind",
+            "docs": [
+              "The last attestation applied, so anyone can check the evidence a payout relied on."
+            ],
+            "type": {
+              "option": {
+                "defined": {
+                  "name": "AttestationKind"
+                }
+              }
+            }
+          },
+          {
+            "name": "last_observed_at",
+            "type": "i64"
+          },
+          {
+            "name": "last_evidence_hash",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "vault_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "DealStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Listed"
+          },
+          {
+            "name": "Funded"
+          },
+          {
+            "name": "Delivered"
+          },
+          {
+            "name": "Completed"
+          },
+          {
+            "name": "Refunded"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InitConfigArgs",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "attestor",
+            "type": "pubkey"
+          },
+          {
+            "name": "delivery_window",
+            "type": "i64"
+          },
+          {
+            "name": "protection_period",
+            "type": "i64"
+          },
+          {
+            "name": "grace_period",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ]
+}

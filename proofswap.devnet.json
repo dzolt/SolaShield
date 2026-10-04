@@ -1,0 +1,11 @@
+{
+  "cluster": "devnet",
+  "programId": "7kWKy3wvsLi37vZ5Cp3YvcrpvAkscHj5mXWopBG2JaZd",
+  "config": "6EHFTtviJRkYUhb2jiSEePGa5qAYvfvnBiyZWJtqUBNM",
+  "mint": "Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH",
+  "attestor": "EhcyoHBQgb3CywfVyhVXjhW7AYgKTqqffXKFpPNVddt6",
+  "deliveryWindow": 900,
+  "protectionPeriod": 90,
+  "gracePeriod": 15,
+  "faucetProgramId": "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+}

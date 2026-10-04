@@ -7,10 +7,12 @@ skip-lint = false
 
 [programs.devnet]
 micro_insurance = "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+proofswap = "7kWKy3wvsLi37vZ5Cp3YvcrpvAkscHj5mXWopBG2JaZd"
 will_vault = "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe"
 
 [programs.localnet]
 micro_insurance = "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+proofswap = "7kWKy3wvsLi37vZ5Cp3YvcrpvAkscHj5mXWopBG2JaZd"
 will_vault = "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe"
 
 [provider]

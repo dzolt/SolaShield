@@ -1,3 +1,5 @@
+import { BlockhashExpiredError } from "./txPhase";
+
 /** Polish texts for the program's errors (programs/will_vault/src/error.rs), keyed by error name. */
 const PROGRAM_ERRORS: Readonly<Record<string, string>> = {
   InvalidWindow: "Niepoprawna długość okresu.",
@@ -23,6 +25,9 @@ const PROGRAM_ERRORS: Readonly<Record<string, string>> = {
 
 /** Turns a wallet / Anchor / RPC error into one short message for the UI. */
 export function explainError(error: unknown): string {
+  if (error instanceof BlockhashExpiredError) {
+    return `Transakcja wygasła, zanim trafiła do sieci: podpis w portfelu trwał ${error.signSeconds} s, a transakcja jest ważna tylko około pół minuty. Spróbuj jeszcze raz i zatwierdź w Phantomie od razu.`;
+  }
   const anchorError = (error as { error?: { errorCode?: { code?: string }; errorMessage?: string } } | undefined)?.error;
   const code = anchorError?.errorCode?.code;
   if (code && PROGRAM_ERRORS[code]) return PROGRAM_ERRORS[code];

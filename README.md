@@ -1,109 +1,119 @@
-# 🛡️ SolaShield: ochrona wypłaty w SOL (Solana, Anchor)
+# ⇄ ProofSwap: skiny CS2 od obcych, bez middlemana (Solana, Anchor)
 
-**Dla kogo:** freelancerzy i contributorzy DAO, którzy dostają wynagrodzenie w SOL, ale koszty mają w USD/PLN.
-**Co robi:** kupujesz ochronę do dnia wypłaty. Jeśli kurs SOL/USD spadnie o wybrany procent, **program sam wypłaca** ustaloną kwotę w tUSDC. Nie ma ubezpieczyciela, likwidatora szkód ani zgody administratora.
-**Kto był pośrednikiem:** ubezpieczyciel albo broker instrumentów pochodnych (trzyma kapitał, ocenia, decyduje o wypłacie). Jego rolę przejmuje program on-chain.
+**Dla kogo:** gracze CS2, którzy kupują i sprzedają skiny poza Steam Market (Discord, Reddit, grupy wymiany), czyli z obcymi ludźmi, bez historii i bez możliwości dochodzenia czegokolwiek.
 
-W repo: program Anchor (`programs/`), skrypty (`scripts/`) i aplikacja webowa z portfelem Phantom (`app/`).
+**Problem:** Steam Market bierze 15% prowizji (5% Steam + 10% CS2), pojedyncze ogłoszenie może kosztować najwyżej 1 800 USD, a pieniędzy z portfela Steam nie da się wypłacić. Duże wymiany idą więc przez „middlemanów” (zaufanych pośredników, pod których podszywają się oszuści) albo przez marketplace'y, które trzymają pieniądze i same rozstrzygają. Od lipca 2025 r. Steam pozwala sprzedającemu **cofnąć wymianę przez 7 dni** (Trade Protection): sprzedający może wziąć pieniądze, a potem odebrać skina.
+
+**Rozwiązanie:** kupujący płaci do sejfu programu na Solanie. Sprzedający wysyła skina zwykłą wymianą na Steamie. Program wypłaca pieniądze dopiero wtedy, gdy Steam pokazuje skina w inventory kupującego **i** minie okno, w którym wymianę można cofnąć. Jeśli w tym oknie skin wróci do sprzedającego, kupujący dostaje zwrot. Pośrednika, który trzyma pieniądze i decyduje, nie ma.
 
 ## Gdzie znika pośrednik (kod)
 
-Cała logika jest w [`programs/micro_insurance/src/`](programs/micro_insurance/src/):
+Cała logika jest w [`programs/proofswap/src/`](programs/proofswap/src/):
 
-| Co | Gdzie |
+| Reguła | Gdzie |
 |---|---|
-| Kapitał leży na koncie tokenów, którym rządzi tylko program (PDA), żaden klucz go nie ruszy | `instructions/initialize_pool.rs` (konto `vault`), `token_utils.rs` (jedyne miejsce wypłat) |
-| Cena referencyjna jest czytana z Pytha **przez program** przy zakupie, a próg liczy ze wzoru (kupujący go nie wybiera) | `instructions/buy_policy.rs`, `math.rs` (`strike_for`) |
-| Wypłata zależy wyłącznie od ceny Pytha po terminie, rozliczyć może **każdy**, pieniądze idą zawsze do właściciela ochrony | `instructions/settle_price.rs` |
-| Pula nie sprzeda ochrony bez pokrycia, jedna ochrona to najwyżej 20% puli, dawca nie wypłaci kapitału, który zabezpiecza aktywne ochrony | `instructions/buy_policy.rs`, `instructions/withdraw.rs` |
-| **Blokada wpłaty dawcy:** po każdej wpłacie program odrzuca wypłatę przez czas ustalony przy tworzeniu puli (na devnecie 10 minut), więc dawca nie wycofa kapitału tuż przed rozliczeniem. Każda kolejna wpłata odnawia blokadę całej pozycji | `instructions/deposit.rs` (`unlock_at`), `instructions/withdraw.rs` |
-| Gdy nikt nie rozliczy: po 7 dniach każdy może unieważnić ochronę i zwrócić składkę | `instructions/void_policy.rs` |
+| Pieniądze leżą w sejfie, którym rządzi tylko program (PDA transakcji); nikt, także my, nie ma do niego klucza | `instructions/fund.rs`, `token_utils.rs` |
+| Kupić można dopiero, gdy Steam potwierdzi, że skin jest u sprzedającego | `instructions/fund.rs` (`listing_verified`) |
+| Płacić można tylko z publicznym inventory: bez świeżego podpisu atestatora „inventory tego konta Steam jest czytelne” wpłata się nie wykona. Dzięki temu dostawę da się udowodnić, a ukrycie inventory po zapłacie jest świadomą decyzją kupującego | `instructions/fund.rs` |
+| Egzemplarz to nazwa + float + wzór; przedmioty bez floatu (nieunikalne) są odrzucane | `instructions/create_listing.rs` |
+| Dostawa: podpisana obserwacja „skin jest w inventory kupującego”, w terminie dostawy | `instructions/attest.rs` |
+| Wypłata dopiero po oknie cofnięcia (ochrona Steama + zapas), uruchomić może każdy | `instructions/settle.rs` (`finalize`) |
+| Cofnięcie w oknie (skin wrócił do sprzedającego) albo ukrycie inventory przez sprzedającego oznacza zwrot | `instructions/attest_settle.rs` |
+| Ukrycie inventory przez kupującego po zapłacie, **a przed dostawą**, oznacza wypłatę dla sprzedającego. W oknie cofnięcia prywatność kupującego nic nie zmienia, więc sprzedający nie może skrócić okna | `instructions/attest_settle.rs` |
+| Brak dostawy w terminie oznacza zwrot, uruchomić może każdy | `instructions/settle.rs` (`refund`) |
+| Podpis atestatora sprawdza natywny program Ed25519 w tej samej transakcji; program porównuje klucz i dokładną treść wiadomości: transakcja, rodzaj obserwacji, **konto Steam**, czas, hash dowodu. Dowód o jednym koncie nie zastąpi dowodu o innym | `attestation.rs` |
 
-**Kto ma jakie uprawnienia:** admin może tylko dodawać nowe produkty (`add_product`); nie ruszy środków ani istniejących ochron, a produktu nie da się później zmienić. Program da się zaktualizować, dopóki autor nie zablokuje tego (`solana program set-upgrade-authority --final`): do zrobienia przed pokazem.
+Konto transakcji na łańcuchu przechowuje SteamID obu stron, odcisk przedmiotu, cenę, terminy i hash ostatniego dowodu, więc każdy może sprawdzić, na jakiej podstawie poszła wypłata.
+
+## Kto co może
+
+| Kto | Co może | Czego nie może |
+|---|---|---|
+| Sprzedający | wystawić i wycofać nieopłacone ogłoszenie | wypłacić pieniądze przed końcem okna cofnięcia |
+| Kupujący | zapłacić do sejfu | wyjąć pieniędzy z sejfu na własną rękę; zwrot przychodzi tylko według reguł programu |
+| Atestator | podpisać to, co widzi w publicznym inventory Steam | ruszyć pieniędzy ani wysłać ich nikomu poza kupującym i sprzedającym tej transakcji |
+| Każdy | wysłać podpisany dowód, uruchomić wypłatę albo zwrot, gdy minie termin | zmienić reguły |
+| Autor (my) | raz ustawić konfigurację (atestator, token, okna czasowe) | zmienić jej później: nie ma instrukcji administratora |
+
+Kod programu na devnecie da się jeszcze podmienić kluczem wdrożeniowym. Ostatni krok przed oddaniem projektu to zablokowanie aktualizacji (`solana program set-upgrade-authority --final`); wtedy reguł nie zmieni już nikt.
+
+## Atestator: co robi i czym różni się od pośrednika
+
+Program na Solanie nie ma dostępu do internetu, więc nie może sam zapytać Steama. Atestator ([`attestor/`](attestor/)) czyta **publiczne** inventory (`steamcommunity.com/inventory/<steamid>/730/2`), szuka egzemplarza po nazwie, floacie i wzorze i podpisuje, co zobaczył i kiedy. Nie trzyma pieniędzy i nie może ich wysłać nikomu spoza transakcji, a o wypłacie decydują reguły programu. Podpisany dowód może wysłać na łańcuch każdy, a każdą obserwację da się sprawdzić w tym samym publicznym inventory (hash dowodu jest zapisany na koncie transakcji).
+
+Uczciwie: w MVP atestator to jeden klucz, któremu program ufa. Może odmówić podpisu albo podpisać nieprawdę, a wtedy transakcja rozstrzygnie się źle. Następny krok to **zkTLS** (np. Reclaim, którego weryfikator działa już na Solanie): program sprawdza wtedy dowód samej odpowiedzi HTTPS ze Steama zamiast słowa jednego atestatora.
 
 ## Uczciwie o ograniczeniach
 
-- **Cenę dostarcza Pyth.** To rozproszona sieć publikatorów, nie my i nie strona umowy, ale nadal zewnętrzne źródło prawdy.
-- **Okno rozliczenia (10 min):** liczy się pierwsza cena z 10 minut po końcu ochrony, więc obie strony mogą wybrać moment wywołania w tym oknie, a kto nie zdąży, traci możliwość wypłaty (szczegóły i plan naprawy niżej).
-- **Składka to stały procent wypłaty**, a nie wycena opcji. W krachu SOL wszystkie ochrony płacą naraz, więc dawcy mogą stracić (łagodzi to limit 20% na ochronę i reguła rezerw).
-- **Blokada dawcy liczy się od wpłaty, nie od zakupu ochrony.** Dawca, który wpłacił dawno temu, może w każdej chwili wyjąć kapitał, który nie jest zarezerwowany, więc blokada utrudnia „ucieczkę tuż po wpłacie”, ale nie wszystkie jej formy. Na produkcji blokada powinna być dłuższa niż najdłuższa ochrona (tu 10 minut tylko na potrzeby demo). Długość ustala się raz, przy tworzeniu puli.
-- **Token tUSDC** to testowy token z otwartym faucetem (devnet), nie prawdziwy USDC.
-- **Demo na devnecie** nie wymusi spadku ceny o 15%. Pokazujemy mechanizm przez „spadek” i „wzrost” z progiem 0% kupione naraz: jedna z nich się wypłaci.
-- Program nie był audytowany.
+- **Symulator Steama w demo.** Żeby pokazać wymianę bez dwóch prawdziwych kont Steam (Steam Guard od 7 dni, konta bez ograniczeń), dwa konta demo są symulowane w atestatorze, z inventory w dokładnie takim formacie, jaki zwraca Steam. Każdy inny SteamID atestator czyta z prawdziwego Steama.
+- **Okno cofnięcia jest w demo skrócone** (90 s + 15 s). Na produkcji musi wynosić co najmniej 7 dni (Trade Protection) plus zapas.
+- **Publiczne inventory jest warunkiem.** Ukrycie go w trakcie transakcji działa na niekorzyść tego, kto je ukrył: sprzedający w oknie cofnięcia traci sprzedaż (zwrot dla kupującego), a kupujący po zapłacie i przed dostawą traci pieniądze (wypłata dla sprzedającego). Interfejs mówi o tym wprost przed płatnością.
+- **Dowód cofnięcia musi trafić na łańcuch przed końcem okna.** W demo wysyła go przycisk, bo każdy może to zrobić. Na produkcji potrzebny jest strażnik (bot, którego może uruchomić każdy kupujący albo osoba trzecia) sprawdzający inventory sprzedającego co kilka minut przez cały okres ochrony.
+- **Konto Steam nie jest jeszcze powiązane z portfelem.** Fałszywe ogłoszenie z cudzym SteamID (z publicznym inventory) nie ukradnie pieniędzy, bo dostawa przyjdzie tylko z prawdziwego konta, więc kupujący dostaje zwrot po terminie dostawy. Może jednak zająć mu czas. Następny krok to logowanie przez Steam OpenID i podpis „to konto należy do tego portfela”.
+- **Steam ogranicza liczbę zapytań** do inventory; przy dużym ruchu atestator potrzebuje cache i kilku adresów.
+- **Trade Protection dotyczy dziś tylko CS2.** Dla innych gier ze Steama okres sporu ustawia się w konfiguracji.
+- **Token tUSDC** to testowy token z otwartym faucetem (devnet). Program nie był audytowany.
 
-## Okno rozliczenia: dlaczego 10 minut i co po nim
+## Uruchomienie
 
-**Jak działa dziś.** Konto ceny Pytha na Solanie przechowuje tylko najnowszy odczyt i jest nadpisywane co ok. 20 s, więc program widzi cenę „z ostatnich sekund”, a nie z dokładnej chwili końca ochrony. Dlatego rozliczenie przyjmuje cenę opublikowaną w oknie `[koniec, koniec + 10 min]` (stała `OBSERVATION_WINDOW` w `constants.rs`). Pierwsze udane wywołanie zamyka ochronę.
-
-**Dlaczego akurat 10 minut.** To kompromis, który wybrałem ręcznie, nie wartość wyliczona z danych. Okno musi być dość długie, żeby ktoś zdążył je zauważyć i rozliczyć (kilka odświeżeń feedu, czas na podpis w portfelu), a dość krótkie, żeby ograniczyć możliwość wybierania momentu. Można je zmienić jedną stałą.
-
-**Co jeśli nikt nie rozliczy w ciągu 10 minut.**
-- Rozliczenie nie jest już możliwe: żadna cena, którą da się podać, nie spełnia warunku okna.
-- Ochrona zostaje „Aktywna”, składka i zarezerwowany kapitał pozostają zablokowane w puli.
-- Po **7 dniach od końca** każdy może wywołać `void_policy`: właściciel dostaje z powrotem **składkę**, rezerwa się zwalnia.
-- Konsekwencja: **nawet jeśli cena spełniała warunek, właściciel, który nie zdążył, nie dostaje wypłaty, tylko zwrot składki**, a kapitał dawców jest zamrożony na 7 dni. To realna wada obecnego prototypu. Łagodzi ją bot rozliczający zaraz po końcu (`npm run keeper`, `scripts/keeper.ts`) i komunikat w aplikacji o minionym oknie. Bot nie ma żadnych specjalnych uprawnień: to kolejny wywołujący, który płaci opłatę, a wynik i adresata wypłaty nadal wyznacza program; gdyby przestał działać, rozliczyć może ktokolwiek inny.
-
-**Plan naprawy (gdyby był tydzień): cena z dokładnej chwili końca.** Wtedy okno przestaje być potrzebne, bo rozliczyć można w dowolnym momencie po końcu, a wynik jest ten sam. Krok po kroku:
-1. Bot pobiera z Pytha cenę z konkretnego znacznika czasu i publikuje ją na łańcuchu przez program odbiorczy Pytha. Program już dziś przyjmuje każde w pełni zweryfikowane konto ceny tego programu.
-2. Program dopisuje regułę „poprzednia publikacja była przed końcem ochrony, ta po końcu” (pole `prev_publish_time` ceny), która wskazuje dokładnie jedną cenę.
-3. Ograniczenie: pobieranie cen historycznych wymaga klucza API Pytha. Plan darmowy nie daje dostępu do API, a plany z API zaczynają się od 500 USD/mc (okres próbny jest, ale nie znalazłem jego długości). Klucza nie wolno trzymać we froncie, więc potrzebny jest mały backend, który tylko pobiera i publikuje cenę (podpisy sprawdza program, backend o niczym nie decyduje).
-4. Nie sprawdzałem tego w działającym kodzie: to plan, nie coś zrobionego.
-
-## Uruchomienie lokalne (bez internetu i bez prawdziwych SOL)
-
-Wymagania: Docker, Node 22+. Kontener z Anchorem, Solaną i Surfpoolem jest w `Dockerfile` (na Macu z Apple Silicon działa przez emulację amd64, więc pierwszy build jest wolny). Wszystkie komendy uruchamiasz z głównego katalogu repo.
+Wymagania: Docker (Anchor, Solana, Surfpool w `Dockerfile`), Node 22+.
 
 ```bash
-docker build --platform linux/amd64 --target toolchain -t micro-insurance-dev .
-docker run --rm -it -v "$PWD":/workspaces/micro-insurance -w /workspaces/micro-insurance -p 8899:8899 micro-insurance-dev
-# w kontenerze: anchor build, potem walidator i wdrożenie (komendy niżej)
+npm install && (cd market && npm install)
 
-npm install
-CLUSTER=localnet npm run setup      # mint tUSDC, pula, produkty; kopiuje IDL do aplikacji
-npm run feed:local                  # lokalny odpowiednik feedu Pytha (cenę zmienisz: echo 130 > keys/local-price.txt)
-CLUSTER=localnet npm run check      # test dymny: zakup trzech ochron i rozliczenie
-CLUSTER=localnet npm run keeper     # opcjonalny bot: sam rozlicza ochrony po terminie (z KEEPER=1 w `check` nikt nie klika)
-cd app && npm install && npm run dev   # aplikacja: http://localhost:5175
+# devnet (program już wdrożony, adresy niżej)
+export CLUSTER=devnet RPC_URL=<adres RPC devnetu>
+npm run attestor                      # atestator + symulator Steama na http://localhost:8787
+cd market && npm run dev              # aplikacja na http://localhost:5176 (VITE_RPC_URL w market/.env.local)
+
+# test dymny całego przepływu (atestator musi działać)
+npm run ps:check
 ```
 
-Uruchomienie walidatora (w kontenerze, port 8899) i wdrożenie programu:
+Lokalnie: walidator Surfpool w kontenerze, `solana program deploy target/deploy/proofswap.so ...`, potem `CLUSTER=localnet npm run ps:setup` i to samo co wyżej z `CLUSTER=localnet`.
 
-```bash
-surfpool start --offline --host 0.0.0.0 --no-tui --no-studio --no-deploy -y \
-  --airdrop <adres_deployera> -q 100000000000
-solana program deploy target/deploy/micro_insurance.so \
-  --program-id target/deploy/micro_insurance-keypair.json --keypair keys/deployer.json --url http://127.0.0.1:8899
-```
-
-**Własny portfel (Phantom) na lokalnej sieci:** Ustawienia → Developer Settings → włącz Testnet Mode → wybierz Solana Localnet. Zasil adres: `curl localhost:8899 -X POST -H 'content-type: application/json' -d '{"jsonrpc":"2.0","id":1,"method":"requestAirdrop","params":["<twój adres>",1000000000]}'`.
-
-## Devnet (wymóg zadania)
-
-1. Zasil deployera (adres w `keys/deployer.json`, klucz **nie** idzie do repo) przez https://faucet.solana.com (potrzeba ok. 5 SOL na wdrożenie programu).
-2. `solana program deploy ... --url devnet`, potem `CLUSTER=devnet npm run setup` i `CLUSTER=devnet npm run check`.
-3. Publiczny RPC devnetu ogranicza zapytania: do pokazu ustaw własny klucz, np. `VITE_RPC_URL=<adres RPC>` dla aplikacji (w `app/.env.local`, plik nie trafia do repo) i `RPC_URL=<adres RPC>` dla skryptów.
-4. Cena SOL/USD pochodzi z kont Pytha zasilanych na devnecie (odczyt on-chain nie wymaga klucza API).
+**Phantom:** Ustawienia → Developer Settings → Testnet Mode → Solana Devnet. W aplikacji przycisk „Odbierz testowe tUSDC” daje tokeny do płacenia.
 
 ## Adresy na devnecie
 
 | Co | Adres |
 |---|---|
-| Program | `GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R` |
-| Pula | `HXwQAHfGffPSeN6dC9gmBPDdCYty5Q4H4ZbQAUZcr285` |
-| Token tUSDC | `Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH` |
+| Program ProofSwap | `7kWKy3wvsLi37vZ5Cp3YvcrpvAkscHj5mXWopBG2JaZd` |
+| Konfiguracja | `6EHFTtviJRkYUhb2jiSEePGa5qAYvfvnBiyZWJtqUBNM` |
+| Klucz atestatora | `EhcyoHBQgb3CywfVyhVXjhW7AYgKTqqffXKFpPNVddt6` |
+| Token tUSDC (z otwartym faucetem) | `Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH` |
 
-Aktualne adresy zawsze są w `deployment.<klaster>.json` i w karcie „Wspólna pula” w aplikacji. Adres puli jest liczony z adresu tokena, więc nowy token oznacza nową pulę.
+## Sejf spadkowy (`programs/will_vault`)
+
+Testament bez notariusza: właściciel odkłada tUSDC do sejfu programu i wskazuje spadkobierców z procentami. Gdy przestanie się meldować, program sam dzieli saldo.
+
+- **Osobny adres i osobna pula na każdy testament** (PDA z właściciela i numeru, sejf na tokeny ma za właściciela ten PDA). Nic nie miesza się z ProofSwap ani z pulą ubezpieczeń.
+- **Czas:** cisza przez `inactivity_period` (produkcyjnie 90 dni), potem procedura `claim_period` (30 dni), potem wypłatę uruchamia `trigger_distribution` **dowolna osoba**. Okresy są w konfiguracji programu, w demo 20 s i 10 s.
+- **Wpłacać i wypłacać może tylko właściciel**, a każda jego transakcja resetuje licznik. Dopóki nikt nie uruchomił wypłaty, może się też zameldować (`check_in`) albo anulować testament (`cancel_will`, wraca wszystko i opłata za konta).
+- **Spadkobiercy i procenty mogą być ostateczne** (`lock_beneficiaries`), a wpłaty dalej działają. Udziały liczy się od salda w chwili wypłaty. Ostateczny jest więc podział, nie kwota: właściciel nadal może wypłacić pieniądze albo anulować sejf.
+- **Strażnik** (jedna osoba) może zgłosić weto dopiero, gdy właściciel zamilkł, i najwyżej 2 razy do czasu, aż właściciel się zamelduje. Nie ma dostępu do pieniędzy.
+- **Wypłata „pull”:** każdy spadkobierca odbiera udział osobnym `claim_share`, więc brak konta tokenowego jednej osoby nie blokuje reszty. Reszta z zaokrągleń trafia do ostatniego spadkobiercy.
+
+```bash
+anchor build -p will_vault && solana program deploy target/deploy/will_vault.so --program-id target/deploy/will_vault-keypair.json --keypair keys/deployer.json
+CLUSTER=localnet npm run will:setup   # konfiguracja (INACTIVITY=.. CLAIM=.. w sekundach), kopiuje IDL do will/
+CLUSTER=localnet npm run will:check   # test dymny: cały scenariusz razem z odmowami
+cd will && npm install && npm run dev # aplikacja: http://localhost:5177
+```
+
+Ograniczenia: jeśli właściciel zginie i nikt nie uruchomi wypłaty, pieniądze czekają w sejfie (nie wygasają). Program nie był audytowany.
 
 ## Struktura
 
 ```
-programs/micro_insurance/   program Anchor (Rust): pula, produkty, polisy, rozliczenie z Pytha, zwrot po terminie, faucet
-scripts/setup.ts            mint tUSDC, pula, produkty; zapisuje deployment.<klaster>.json i kopiuje IDL do aplikacji
-scripts/check.ts            test dymny na żywej sieci (faucet, wpłata, zakup, rozliczenie, saldo)
-scripts/keeper.ts           opcjonalny bot rozliczający ochrony po terminie (bez uprawnień)
-scripts/local-feed.ts       lokalny odpowiednik konta cen Pytha (tylko do testów offline)
-scripts/lib/                wspólne klocki (klucze, odczyt konta cen Pytha), używane też przez aplikację
-app/                        aplikacja React + Wallet Adapter (Vite), portfel Phantom
-keys/                       klucze testowe (ignorowane przez git)
-Dockerfile, .devcontainer/  środowisko z Anchorem, Solaną i Surfpoolem
+programs/proofswap/        program Anchor: ogłoszenia, sejf, atestacje Ed25519, okno cofnięcia, wypłata i zwrot
+attestor/                  atestator (czyta inventory Steam, podpisuje obserwacje) i symulator Steama do demo
+market/                    aplikacja React + Wallet Adapter (Phantom): rynek, wystawianie, transakcja z dowodami
+scripts/proofswap-setup.ts konfiguracja programu na klastrze, kopiuje IDL do aplikacji
+scripts/proofswap-check.ts test dymny: sprzedaż, cofnięcie wymiany, odmowa fałszywej dostawy
+programs/will_vault/       program Anchor: sejf spadkowy (licznik ciszy, spadkobiercy, strażnik, wypłata na żądanie)
+will/                      aplikacja React dla sejfu spadkowego (port 5177)
+scripts/will-*.ts          konfiguracja i test dymny sejfu spadkowego
+programs/micro_insurance/  wcześniejszy prototyp (SolaShield); ProofSwap korzysta tylko z jego otwartego faucetu tUSDC
+app/, scripts/*.ts         aplikacja i skrypty wcześniejszego prototypu
 ```

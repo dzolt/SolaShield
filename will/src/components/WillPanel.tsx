@@ -1,7 +1,7 @@
 import type { PublicKey } from "@solana/web3.js";
 import type { HeirDraft } from "../actions";
 import { explorerAddress, MAX_VETOES } from "../config";
-import { phaseOf, rolesOf, type Will } from "../data";
+import { phaseOf, rolesOf, type Role, type Will } from "../data";
 import { formatUsdc, shortAddress } from "../format";
 import type { ActionRunner } from "../hooks";
 import { Card, Stat } from "../ui";
@@ -28,9 +28,11 @@ interface WillPanelProps extends WillHandlers {
   readonly now: number;
   readonly me: PublicKey | undefined;
   readonly runner: ActionRunner;
+  /** Role picked on the first screen; only its actions are shown. */
+  readonly role: Role;
 }
 
-export function WillPanel({ will, now, me, runner, ...handlers }: WillPanelProps) {
+export function WillPanel({ will, now, me, runner, role, ...handlers }: WillPanelProps) {
   if (!will) {
     return (
       <Card title="Szczegóły sejfu">
@@ -39,8 +41,9 @@ export function WillPanel({ will, now, me, runner, ...handlers }: WillPanelProps
     );
   }
   const roles = rolesOf(will, me);
-  const isOwner = roles.includes("owner");
-  const isGuardian = roles.includes("guardian");
+  const isOwner = role === "owner" && roles.includes("owner");
+  const isGuardian = role === "guardian" && roles.includes("guardian");
+  const isHeir = role === "heir" && roles.includes("heir");
   const phase = phaseOf(will, now);
   const frozen = will.distributing;
 
@@ -62,7 +65,7 @@ export function WillPanel({ will, now, me, runner, ...handlers }: WillPanelProps
         <HeirsTable
           will={will}
           me={me}
-          canClaim={frozen && Boolean(me)}
+          canClaim={frozen && isHeir}
           busy={runner.busy}
           onClaim={handlers.onClaimShare}
         />
@@ -86,14 +89,23 @@ export function WillPanel({ will, now, me, runner, ...handlers }: WillPanelProps
         ) : null}
 
         {isGuardian && !frozen ? (
-          <button disabled={runner.busy || phase === "active"} onClick={handlers.onVeto}>
-            Weto: właściciel żyje, zacznij odliczanie od nowa
-          </button>
+          <div className="stack">
+            <button disabled={runner.busy || phase === "active" || will.vetoesUsed >= MAX_VETOES} onClick={handlers.onVeto}>
+              Weto: właściciel żyje, zacznij odliczanie od nowa
+            </button>
+            <span className="muted">
+              {phase === "active"
+                ? "Weto jest możliwe dopiero, gdy właściciel zamilknie na cały okres ciszy."
+                : will.vetoesUsed >= MAX_VETOES
+                  ? "Wykorzystałeś oba weta. Licznik może zresetować już tylko właściciel."
+                  : "Zostało ci weto: użyj go, jeśli wiesz, że właściciel żyje."}
+            </span>
+          </div>
         ) : null}
 
-        {phase === "claimable" ? (
+        {isHeir && phase === "claimable" ? (
           <button className="primary" disabled={runner.busy || !me} onClick={handlers.onTrigger}>
-            Uruchom wypłatę (może każdy)
+            Uruchom wypłatę
           </button>
         ) : null}
       </div>

@@ -15,5 +15,8 @@ keys/*.json
 # local backup of an abandoned devnet deployment
 deployment.*.old.json
 
+# runtime state of the demo Steam simulator (rebuilt from attestor/fixtures)
+attestor/data/
+
 *.log
 .DS_Store

@@ -1,0 +1,126 @@
+{
+  "nextAssetId": 46000000001,
+  "accounts": {
+    "76561198000000101": {
+      "label": "Sprzedający (demo Steam)",
+      "private": false,
+      "inventory": {
+        "assets": [
+          { "appid": 730, "contextid": "2", "assetid": "45372276893", "classid": "7993039380", "instanceid": "6276312861", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "45262916158", "classid": "7993036846", "instanceid": "519977179", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "45259509737", "classid": "7993035983", "instanceid": "302028390", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "45000586045", "classid": "241581032", "instanceid": "302028390", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "30685807363", "classid": "7993036954", "instanceid": "302028390", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "19335481743", "classid": "241599779", "instanceid": "302028390", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "22015191300", "classid": "4302203138", "instanceid": "188530139", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "17595442876", "classid": "778383679", "instanceid": "0", "amount": "1" }
+        ],
+        "descriptions": [
+          {
+            "appid": 730, "classid": "7993039380", "instanceid": "6276312861", "tradable": 1,
+            "name": "AK-47 | Steel Delta", "market_hash_name": "AK-47 | Steel Delta (Minimal Wear)",
+            "type": "Mil-Spec Grade Rifle", "name_color": "4b69ff",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLwlcK3wiVI0POlPPNSM-SBAWmV_uJ_t-l9AXqyk0hy5GWEyduhdC2TPAEjDptzQbRf5EHrmoWyZu22sQLciokQyyzgznQesAEGx_A"
+          },
+          {
+            "appid": 730, "classid": "7993036846", "instanceid": "519977179", "tradable": 1,
+            "name": "M4A1-S | Wash me plz", "market_hash_name": "M4A1-S | Wash me plz (Minimal Wear)",
+            "type": "Industrial Grade Rifle", "name_color": "5e98d9",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL8ypexwjFS4_ega6F_H_iKMWiGxPxmsfJ6cC28mhkrtgKIzo6oMhTLN1F4Tox1TLUNthHuxtbuZejntAzWjNlNmX6rjylJuyhp6-kLBKt38vKFiFuUL_Rjtk_8Ljjf"
+          },
+          {
+            "appid": 730, "classid": "7993035983", "instanceid": "302028390", "tradable": 1,
+            "name": "Five-SeveN | Autumn Thicket", "market_hash_name": "Five-SeveN | Autumn Thicket (Field-Tested)",
+            "type": "Consumer Grade Pistol", "name_color": "b0c3d9",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL3l4Dl7idN6vyRe6tiH_KBD2mTyetlj-xsSyCmmFMm627WyoyveXufawZ0X5B0QOFZ5xe5x9zuNb7hsgKLjoJBxCir2ClA8G81tPOZ0LnY"
+          },
+          {
+            "appid": 730, "classid": "241581032", "instanceid": "302028390", "tradable": 1,
+            "name": "Nova | Predator", "market_hash_name": "Nova | Predator (Field-Tested)",
+            "type": "Consumer Grade Shotgun", "name_color": "b0c3d9",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyL_kYDhwjFL0OirarZsI_GeMWqVxedjva9rHC_nlxx24jnXmY2pJ3qVZw51C5V4EeQJthbtx9K2MruztgOMj4NB02yg2XPmt0BC"
+          },
+          {
+            "appid": 730, "classid": "7993036954", "instanceid": "302028390", "tradable": 1,
+            "name": "Sawed-Off | Forest DDPAT", "market_hash_name": "Sawed-Off | Forest DDPAT (Field-Tested)",
+            "type": "Consumer Grade Shotgun", "name_color": "b0c3d9",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLin4Hl-S1d6c2mcZtpJOCSGlidxOp_pewnS3G2wE9-5GTQydqqcnuVbQcpXMMhRbIK4EbulIbgP-Ln4wGPiowRnjK-0H1uduhr7Q"
+          },
+          {
+            "appid": 730, "classid": "241599779", "instanceid": "302028390", "tradable": 1,
+            "name": "PP-Bizon | Sand Dashed", "market_hash_name": "PP-Bizon | Sand Dashed (Minimal Wear)",
+            "type": "Consumer Grade SMG", "name_color": "b0c3d9",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGIGz3UqlXOLrxM-vMGmW8VNxu5Dx60noTyLzl4zv8x1I_826abRoH-ObAXWE_v13vuVWQyC0nQlp62XcyNygJCrDawR1WZIlQ7QL4xS_wNblPu_h7gOP3oJHynr8iHhK6zErvbioPrlsUA"
+          },
+          {
+            "appid": 730, "classid": "4302203138", "instanceid": "188530139", "tradable": 1,
+            "name": "Sticker | FaZe | 2020 RMR", "market_hash_name": "Sticker | FaZe | 2020 RMR",
+            "type": "High Grade Sticker", "name_color": "4b69ff",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNisJynHtwY68obu7xe-EkSmy5XkrHAKuPb6OvA_eKbDDDGSlrgv6LMxHCzkwxsltT_RzIyhbzvJOXk2IA1S"
+          },
+          {
+            "appid": 730, "classid": "778383679", "instanceid": "0", "tradable": 0,
+            "name": "5 Year Veteran Coin", "market_hash_name": "5 Year Veteran Coin",
+            "type": "Extraordinary Collectible", "name_color": "eb4b4b",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai2l-lQ8ndwMWvJjTC_FN05oT741epGR73mMHmpXEO7aT2bfE9I_KVCDTGx7gj4LE5F3iykU504TvVnN7_JWXXMFEPozcG1w"
+          }
+        ],
+        "asset_properties": [
+          { "appid": 730, "contextid": "2", "assetid": "45372276893", "asset_properties": [
+            { "propertyid": 1, "int_value": "406", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.13201749324798584", "name": "Wear Rating" }
+          ] },
+          { "appid": 730, "contextid": "2", "assetid": "45262916158", "asset_properties": [
+            { "propertyid": 1, "int_value": "43", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.0939696580171585083", "name": "Wear Rating" }
+          ] },
+          { "appid": 730, "contextid": "2", "assetid": "45259509737", "asset_properties": [
+            { "propertyid": 1, "int_value": "543", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.150023877620697021", "name": "Wear Rating" }
+          ] },
+          { "appid": 730, "contextid": "2", "assetid": "45000586045", "asset_properties": [
+            { "propertyid": 1, "int_value": "390", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.301816970109939575", "name": "Wear Rating" }
+          ] },
+          { "appid": 730, "contextid": "2", "assetid": "30685807363", "asset_properties": [
+            { "propertyid": 1, "int_value": "470", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.161421731114387512", "name": "Wear Rating" }
+          ] },
+          { "appid": 730, "contextid": "2", "assetid": "19335481743", "asset_properties": [
+            { "propertyid": 1, "int_value": "441", "name": "Pattern Template" },
+            { "propertyid": 2, "float_value": "0.137092754244804382", "name": "Wear Rating" }
+          ] }
+        ],
+        "total_inventory_count": 8,
+        "success": 1
+      }
+    },
+    "76561198000000202": {
+      "label": "Kupujący (demo Steam)",
+      "private": false,
+      "inventory": {
+        "assets": [
+          { "appid": 730, "contextid": "2", "assetid": "51000000001", "classid": "4302203080", "instanceid": "188530139", "amount": "1" },
+          { "appid": 730, "contextid": "2", "assetid": "51000000002", "classid": "1989295955", "instanceid": "302028390", "amount": "1" }
+        ],
+        "descriptions": [
+          {
+            "appid": 730, "classid": "4302203080", "instanceid": "188530139", "tradable": 1,
+            "name": "Sticker | Vitality (Holo) | 2020 RMR", "market_hash_name": "Sticker | Vitality (Holo) | 2020 RMR",
+            "type": "Remarkable Sticker", "name_color": "8847ff",
+            "icon_url": "i0CoZ81Ui0m-9KwlBY1L_18myuGuq1wfhWSaZgMttyVfPaERSR0Wqmu7LAocGJai0ki7VeTHjNisJynHtwY64o7g62bvThH-0MC0-SBZ6qetOPI7dPSXXT7IlbYitrdsTXrrkBt34TzXn9f4eS7GPAc-SswnVN7wPAQ"
+          },
+          {
+            "appid": 730, "classid": "1989295955", "instanceid": "302028390", "tradable": 1,
+            "name": "Sealed Graffiti | Cocky (Dust Brown)", "market_hash_name": "Sealed Graffiti | Cocky (Dust Brown)",
+            "type": "Base Grade Graffiti", "name_color": "b0c3d9",
+            "icon_url": "IzMF03bi9WpSBq-S-ekoE33L-iLqGFHVaU25ZzQNQcXdB2ozio1RrlIWFK3UfvMYB8UsvjiMXojflsZalyxSh31CIyHz2GZ-KuFpPsrTzBG0s-2CD2DyenmRKnHaGgo8SeVaYGDR_jb2s7zGRTmYELwsFQ1QK_NX-mRJOMvcaRRoysdVrCO7mEhyDBs9ftFPYAOilywVZrlwzP1985rG"
+          }
+        ],
+        "asset_properties": [],
+        "total_inventory_count": 2,
+        "success": 1
+      }
+    }
+  }
+}
