@@ -1,19 +1,25 @@
 import { windowEnd, type Deal } from "./data";
+import type { Tone } from "./ui";
 
-export type Tone = "ok" | "warn" | "bad" | "info";
+export interface DealLabel {
+  readonly text: string;
+  readonly tone: Tone;
+}
 
-/** One label per deal state, phrased for players rather than for the program. */
-export function dealLabel(deal: Deal, now: number): { text: string; tone: Tone } {
+/** A short label per deal state, phrased for people rather than for the program (cards, badges). */
+export function dealLabel(deal: Deal, now: number): DealLabel {
   switch (deal.status) {
     case "listed":
-      return deal.listingVerified ? { text: "Na sprzedaż · potwierdzony w Steam", tone: "ok" } : { text: "Na sprzedaż · niepotwierdzony", tone: "warn" };
+      return deal.listingVerified ? { text: "Na sprzedaż", tone: "ok" } : { text: "Niepotwierdzone", tone: "warn" };
     case "funded":
-      return now > deal.deliveryDeadline ? { text: "Nie dostarczono na czas", tone: "bad" } : { text: "Opłacony · czeka na wymianę", tone: "warn" };
+      return now > deal.deliveryDeadline ? { text: "Po terminie", tone: "bad" } : { text: "Opłacone", tone: "accent" };
     case "delivered":
-      return now > windowEnd(deal) ? { text: "Okno cofnięcia minęło · do wypłaty", tone: "ok" } : { text: "Dostarczony · okno cofnięcia", tone: "warn" };
+      return now > windowEnd(deal) ? { text: "Do wypłaty", tone: "ok" } : { text: "Okno cofnięcia", tone: "warn" };
     case "completed":
-      return { text: "Zakończony · sprzedający opłacony", tone: "ok" };
+      return { text: "Zakończone", tone: "ok" };
     case "refunded":
-      return { text: "Zwrot dla kupującego", tone: "bad" };
+      return { text: "Zwrot", tone: "bad" };
   }
 }
+
+export const isFinished = (deal: Deal): boolean => deal.status === "completed" || deal.status === "refunded";

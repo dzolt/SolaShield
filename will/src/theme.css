@@ -1,22 +1,23 @@
-/* Sejf spadkowy: warm, calm, light. Cream paper, sea green, a touch of gold. Structure lives in ../../ui/base.css. */
+/* Ostatnia Wola Sola: warm, calm, light. Cream paper, sea green, a touch of gold. Structure lives in ../../ui/*.css. */
 :root {
-  --bg: #faf6ef;
-  --bg-glow: radial-gradient(900px 400px at 12% -140px, rgba(217, 164, 65, 0.2), transparent 70%),
-    radial-gradient(760px 360px at 96% -80px, rgba(29, 122, 107, 0.13), transparent 70%);
-  --surface: #fffefb;
-  --surface-2: #f8f3ea;
-  --surface-3: #efe8da;
-  --text: #2a2622;
-  --muted: #756e63;
-  --faint: #aaa295;
-  --border: #ece4d5;
+  --bg: #faf6ee;
+  --bg-glow: radial-gradient(900px 420px at 10% -150px, rgba(217, 164, 65, 0.22), transparent 70%),
+    radial-gradient(760px 380px at 96% -90px, rgba(29, 122, 107, 0.14), transparent 70%);
+  --surface: #fffdf9;
+  --surface-2: #f9f4ea;
+  --surface-3: #f0e9db;
+  --text: #2b2723;
+  --text-2: #4c453d;
+  --muted: #7a7266;
+  --faint: #ada597;
+  --border: #ede5d6;
   --border-strong: #ddd2bf;
 
-  --accent: #1d7a6b;
-  --accent-strong: #155f53;
-  --accent-soft: #e2f2ee;
+  --accent: #1b7a6a;
+  --accent-strong: #145f52;
+  --accent-soft: #e0f2ee;
   --accent-border: #b5dbd2;
-  --accent-shadow: rgba(29, 122, 107, 0.3);
+  --accent-shadow: rgba(27, 122, 106, 0.32);
   --on-accent: #ffffff;
 
   --ok: #2b8a57;
@@ -29,10 +30,9 @@
   --bad-border: #f1c9b3;
   --gold: #d9a441;
 
-  --brand-gradient: linear-gradient(135deg, #3aa893, #1d7a6b);
-  --radius: 18px;
+  --brand-gradient: linear-gradient(135deg, #3aa893, #1b7a6a);
   --shadow-xs: 0 1px 2px rgba(62, 45, 20, 0.06);
-  --shadow-sm: 0 1px 2px rgba(62, 45, 20, 0.04), 0 8px 24px rgba(62, 45, 20, 0.06);
-  --shadow-lg: 0 12px 40px rgba(62, 45, 20, 0.16);
-  --ring: 0 0 0 3px rgba(29, 122, 107, 0.25);
+  --shadow-sm: 0 1px 2px rgba(62, 45, 20, 0.04), 0 8px 24px -8px rgba(62, 45, 20, 0.1);
+  --shadow-lg: 0 18px 50px -12px rgba(62, 45, 20, 0.24);
+  --ring: 0 0 0 4px rgba(27, 122, 106, 0.18);
 }

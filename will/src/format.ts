@@ -17,6 +17,42 @@ export function parseUsdc(input: string): bigint {
   return BigInt(whole) * 10n ** BigInt(TOKEN_DECIMALS) + BigInt(fraction.padEnd(TOKEN_DECIMALS, "0"));
 }
 
+const priceFormat = new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 0, maximumFractionDigits: 2, useGrouping: "always" });
+const priceFormatCents = new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" });
+
+/** Token amount without the unit and without needless ",00": 500000000 -> "500", 12500000 -> "12,50". */
+export function formatPrice(amount: bigint): string {
+  const whole = Number(amount / 10n ** BigInt(TOKEN_DECIMALS));
+  const fraction = Number(amount % 10n ** BigInt(TOKEN_DECIMALS)) / 10 ** TOKEN_DECIMALS;
+  const value = whole + fraction;
+  return Number.isInteger(value) ? priceFormat.format(value) : priceFormatCents.format(value);
+}
+
+/** 85 -> "1:25", 3725 -> "1:02:05": a countdown in the form people read on a clock. */
+export function clock(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const two = (n: number): string => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${m}:${two(s)}`;
+}
+
+/** Time left in the largest sensible unit: "89 dni", "5 godz.", or a clock for the last hour. */
+export function timeLeft(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  if (total >= 86_400) return `${Math.floor(total / 86_400)} dni`;
+  if (total >= 7_200) return `${Math.floor(total / 3_600)} godz.`;
+  return clock(total);
+}
+
+/** A base-unit amount as the text a person would type into an amount field: 12500000 -> "12.5". */
+export function toInputAmount(amount: bigint): string {
+  const whole = amount / 10n ** BigInt(TOKEN_DECIMALS);
+  const fraction = (amount % 10n ** BigInt(TOKEN_DECIMALS)).toString().padStart(TOKEN_DECIMALS, "0").replace(/0+$/, "");
+  return fraction ? `${whole}.${fraction}` : `${whole}`;
+}
+
 /** "33,5" -> 3350 basis points; at most two decimals. */
 export function parsePercent(input: string): number {
   const normalized = input.trim().replace(",", ".");

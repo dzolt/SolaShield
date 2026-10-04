@@ -1,37 +1,38 @@
-/* ProofSwap: cool, precise, "tech and trust". Structure lives in ../../ui/base.css. */
+/* ProofSwap: cool, precise, "tech and trust". Structure lives in ../../ui/*.css. */
 :root {
-  --bg: #f5f6fb;
-  --bg-glow: radial-gradient(900px 380px at 82% -120px, rgba(79, 107, 255, 0.15), transparent 70%);
+  --bg: #f6f7fc;
+  --bg-glow: radial-gradient(1000px 460px at 82% -160px, rgba(99, 102, 241, 0.17), transparent 70%),
+    radial-gradient(760px 380px at 6% -140px, rgba(56, 189, 248, 0.11), transparent 70%);
   --surface: #ffffff;
-  --surface-2: #f7f8fc;
-  --surface-3: #eceff7;
-  --text: #141a2e;
-  --muted: #5b6480;
-  --faint: #98a0b8;
-  --border: #e4e8f3;
-  --border-strong: #d2d8e8;
+  --surface-2: #f8f9fe;
+  --surface-3: #eef0f9;
+  --text: #121631;
+  --text-2: #3b4263;
+  --muted: #636b8c;
+  --faint: #9ba2bd;
+  --border: #e6e9f5;
+  --border-strong: #d3d8ec;
 
-  --accent: #4361ee;
-  --accent-strong: #3049d6;
-  --accent-soft: #eaeefe;
-  --accent-border: #c5d0fb;
-  --accent-shadow: rgba(67, 97, 238, 0.28);
+  --accent: #4f46e5;
+  --accent-strong: #4038c9;
+  --accent-soft: #eceeff;
+  --accent-border: #c9ccf8;
+  --accent-shadow: rgba(79, 70, 229, 0.34);
   --on-accent: #ffffff;
 
-  --ok: #0b8f63;
-  --ok-soft: #dcf5ea;
-  --warn: #b3620a;
-  --warn-soft: #fff3dc;
+  --ok: #067a57;
+  --ok-soft: #dcf6ec;
+  --warn: #a8560a;
+  --warn-soft: #fff1d8;
   --warn-border: #f6d9a3;
-  --bad: #d03a48;
-  --bad-soft: #fdecee;
+  --bad: #c92f3c;
+  --bad-soft: #fde9ea;
   --bad-border: #f3b9bf;
-  --gold: #e4ae39;
+  --gold: #f5b83d;
 
-  --brand-gradient: linear-gradient(135deg, #5b7bff, #7b4dff);
-  --radius: 16px;
-  --shadow-xs: 0 1px 2px rgba(20, 26, 46, 0.05);
-  --shadow-sm: 0 1px 2px rgba(20, 26, 46, 0.04), 0 8px 24px rgba(20, 26, 46, 0.05);
-  --shadow-lg: 0 12px 40px rgba(20, 26, 46, 0.14);
-  --ring: 0 0 0 3px rgba(67, 97, 238, 0.25);
+  --brand-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --shadow-xs: 0 1px 2px rgba(18, 22, 49, 0.05);
+  --shadow-sm: 0 1px 2px rgba(18, 22, 49, 0.04), 0 8px 24px -8px rgba(18, 22, 49, 0.08);
+  --shadow-lg: 0 18px 50px -12px rgba(18, 22, 49, 0.22);
+  --ring: 0 0 0 4px rgba(79, 70, 229, 0.18);
 }

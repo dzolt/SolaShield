@@ -10,6 +10,22 @@ export function formatUsdc(amount: bigint): string {
   return `${amountFormat.format(whole + fraction)} tUSDC`;
 }
 
+const priceFormat = new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 0, maximumFractionDigits: 2, useGrouping: "always" });
+
+/** Token amount without the unit and without needless ",00": 100000000 -> "100", 12500000 -> "12,5". */
+export function formatPrice(amount: bigint): string {
+  const whole = Number(amount / 10n ** BigInt(TOKEN_DECIMALS));
+  const fraction = Number(amount % 10n ** BigInt(TOKEN_DECIMALS)) / 10 ** TOKEN_DECIMALS;
+  const value = whole + fraction;
+  return Number.isInteger(value) ? priceFormat.format(value) : new Intl.NumberFormat("pl-PL", { minimumFractionDigits: 2, maximumFractionDigits: 2, useGrouping: "always" }).format(value);
+}
+
+/** "AK-47 | Steel Delta (Minimal Wear)" -> { title: "AK-47 | Steel Delta", exterior: "Minimal Wear" }. */
+export function splitItemName(name: string): { readonly title: string; readonly exterior: string } {
+  const match = name.match(/^(.*?)\s*\(([^()]+)\)\s*$/);
+  return match ? { title: match[1], exterior: match[2] } : { title: name, exterior: "" };
+}
+
 export function parseUsdc(input: string): bigint {
   const normalized = input.trim().replace(",", ".");
   if (!/^\d+(\.\d{1,6})?$/.test(normalized)) throw new Error("Podaj poprawną cenę, np. 100 lub 12,50");
@@ -37,6 +53,16 @@ export function formatDuration(seconds: number): string {
   if (h > 0) return m > 0 ? `${h} godz. ${m} min` : `${h} godz.`;
   if (m > 0) return s > 0 ? `${m} min ${s} s` : `${m} min`;
   return `${s} s`;
+}
+
+/** 85 -> "1:25", 3725 -> "1:02:05": a countdown in the form people read on a clock. */
+export function clock(seconds: number): string {
+  const total = Math.max(0, Math.round(seconds));
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const two = (n: number): string => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${two(m)}:${two(s)}` : `${m}:${two(s)}`;
 }
 
 /** Wear Rating shortened for display: 0.13201749324798584 -> 0.13202. */

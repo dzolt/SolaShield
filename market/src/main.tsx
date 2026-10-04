@@ -5,7 +5,10 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { RPC_URL } from "./config";
-import "../../ui/base.css";
+import "../../ui/foundation.css";
+import "../../ui/components.css";
+import "../../ui/layout.css";
+import "../../ui/wallet.css";
 import "./theme.css";
 import "./styles.css";
 
