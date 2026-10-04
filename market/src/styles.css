@@ -42,6 +42,11 @@
   box-sizing: border-box;
 }
 
+/* Reserve the scrollbar's space, so the page does not shift sideways when content grows past the window height. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--bg);

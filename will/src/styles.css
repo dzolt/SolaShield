@@ -42,6 +42,11 @@
   box-sizing: border-box;
 }
 
+/* Reserve the scrollbar's space, so the page does not shift sideways when content grows past the window height. */
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   margin: 0;
   background: var(--bg);
@@ -70,6 +75,15 @@ a {
   gap: 16px;
   flex-wrap: wrap;
   align-items: flex-start;
+}
+
+.header > div:first-child {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.header .wallet-box {
+  flex: 0 0 auto;
 }
 
 .brand {
@@ -102,6 +116,37 @@ a {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+}
+
+.wallet-box .wallet-adapter-button {
+  justify-content: center;
+}
+
+/* Narrow screens: the header wraps, so the wallet block takes the full width instead of floating at its content width. */
+@media (max-width: 720px) {
+  .header > * {
+    width: 100%;
+  }
+
+  .header .wallet-box {
+    flex: 1 1 100%;
+  }
+
+  .wallet-box {
+    align-items: stretch;
+  }
+
+  .wallet-box .wallet-adapter-button {
+    width: 100%;
+  }
+
+  .wallet-box .row {
+    justify-content: space-between;
+  }
+
+  .wallet-box .row button {
+    flex: 1 1 100%;
+  }
 }
 
 /* how it works */
