@@ -3106,6 +3106,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "will_vault"
+version = "0.1.0"
+dependencies = [
+ "anchor-lang",
+ "anchor-spl",
+]
+
+[[package]]
 name = "wincode"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"

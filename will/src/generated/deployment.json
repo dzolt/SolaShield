@@ -1,0 +1,9 @@
+{
+  "cluster": "devnet",
+  "programId": "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe",
+  "config": "EphVKmSpsWvVL1czaHgVBcouDzUvLgQpgKMT4wLVYBZN",
+  "mint": "Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH",
+  "inactivityPeriod": 120,
+  "claimPeriod": 60,
+  "faucetProgramId": "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+}

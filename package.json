@@ -10,6 +10,8 @@
     "check": "tsx scripts/check.ts",
     "feed:local": "tsx scripts/local-feed.ts",
     "keeper": "tsx scripts/keeper.ts",
+    "will:setup": "tsx scripts/will-setup.ts",
+    "will:check": "tsx scripts/will-check.ts",
     
     "typecheck": "tsc --noEmit"
   },

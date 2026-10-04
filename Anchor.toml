@@ -7,9 +7,11 @@ skip-lint = false
 
 [programs.devnet]
 micro_insurance = "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+will_vault = "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe"
 
 [programs.localnet]
 micro_insurance = "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+will_vault = "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe"
 
 [provider]
 cluster = "localnet"

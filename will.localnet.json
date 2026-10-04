@@ -1,0 +1,9 @@
+{
+  "cluster": "localnet",
+  "programId": "2nW3VAQxwqAaWfDcskHzvPgVn48WJyaFMbAZMTWavCxe",
+  "config": "EphVKmSpsWvVL1czaHgVBcouDzUvLgQpgKMT4wLVYBZN",
+  "mint": "3XvuAtYt42yvgPz4RVNYBp3p2wZpwpfvv3cJRVwsiFnG",
+  "inactivityPeriod": 20,
+  "claimPeriod": 10,
+  "faucetProgramId": "GHrWtBXvB126xq3JTaZkpziobURgi7XA29JisS1Ra18R"
+}
