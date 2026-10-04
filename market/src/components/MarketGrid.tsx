@@ -2,13 +2,14 @@ import type { PublicKey } from "@solana/web3.js";
 import { useState } from "react";
 import type { Deal } from "../data";
 import { formatUsdc } from "../format";
+import type { DealFilter } from "../roles";
 import { dealLabel } from "../status";
 import { Badge, Card } from "../ui";
 import { ItemTile } from "./ItemTile";
 
-type Filter = "open" | "mine" | "all";
-
 interface MarketGridProps {
+  readonly title: string;
+  readonly filters: readonly DealFilter[];
   readonly deals: readonly Deal[];
   readonly now: number;
   readonly owner: PublicKey | undefined;
@@ -17,29 +18,17 @@ interface MarketGridProps {
   readonly onSelect: (address: string) => void;
 }
 
-/** Open = confirmed listings plus deals in progress; unconfirmed listings and finished deals stay under "Wszystkie". */
-function visible(deal: Deal, filter: Filter, owner: PublicKey | undefined): boolean {
-  if (filter === "all") return true;
-  if (filter === "mine") return !!owner && (deal.seller.equals(owner) || (deal.buyer?.equals(owner) ?? false));
-  return (deal.status === "listed" && deal.listingVerified) || deal.status === "funded" || deal.status === "delivered";
-}
-
-const FILTERS: { id: Filter; label: string }[] = [
-  { id: "open", label: "Otwarte" },
-  { id: "mine", label: "Moje" },
-  { id: "all", label: "Wszystkie" },
-];
-
-export function MarketGrid({ deals, now, owner, selected, iconFor, onSelect }: MarketGridProps) {
-  const [filter, setFilter] = useState<Filter>("open");
-  const shown = deals.filter((d) => visible(d, filter, owner));
+export function MarketGrid({ title, filters, deals, now, owner, selected, iconFor, onSelect }: MarketGridProps) {
+  const [filterId, setFilterId] = useState(filters[0]?.id);
+  const filter = filters.find((f) => f.id === filterId) ?? filters[0];
+  const shown = filter ? deals.filter((d) => filter.test(d, owner)) : [];
   return (
     <Card
-      title="Rynek"
+      title={title}
       aside={
         <div className="row small">
-          {FILTERS.map((f) => (
-            <button key={f.id} className={filter === f.id ? "chip active" : "chip"} onClick={() => setFilter(f.id)}>
+          {filters.map((f) => (
+            <button key={f.id} className={filter?.id === f.id ? "chip active" : "chip"} onClick={() => setFilterId(f.id)}>
               {f.label}
             </button>
           ))}
@@ -47,9 +36,7 @@ export function MarketGrid({ deals, now, owner, selected, iconFor, onSelect }: M
       }
     >
       {shown.length === 0 ? (
-        <p className="muted">
-          {filter === "open" ? "Brak otwartych ogłoszeń. Wystaw skina w zakładce „Wystaw skina”." : "Nic tu jeszcze nie ma."}
-        </p>
+        <p className="muted">{filter?.empty ?? "Nic tu jeszcze nie ma."}</p>
       ) : (
         <div className="tiles">
           {shown.map((deal) => {

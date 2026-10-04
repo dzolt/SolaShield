@@ -5,12 +5,14 @@ import { DEMO_BUYER_STEAM, explorerAddress } from "../config";
 import { windowEnd, type Deal } from "../data";
 import { formatDuration, formatTime, formatUsdc, shortAddress, shortWear } from "../format";
 import type { ActionRunner } from "../hooks";
+import type { Role } from "../roles";
 import { dealLabel } from "../status";
 import { Badge, Card, Progress } from "../ui";
 import { ItemTile } from "./ItemTile";
 import { ProofCard } from "./ProofCard";
 
 interface DealPanelProps {
+  readonly role: Role;
   readonly deal: Deal | undefined;
   readonly now: number;
   readonly owner: PublicKey | undefined;
@@ -76,17 +78,22 @@ function steps(deal: Deal, now: number): Step[] {
   ];
 }
 
-export function DealPanel({ deal, now, owner, runner, proofs, look, onAttest, onFund, onCancel, onFinalize, onRefund }: DealPanelProps) {
+export function DealPanel({ role, deal, now, owner, runner, proofs, look, onAttest, onFund, onCancel, onFinalize, onRefund }: DealPanelProps) {
   const [buyerSteam, setBuyerSteam] = useState(DEMO_BUYER_STEAM);
   if (!deal) {
     return (
       <Card title="Transakcja">
-        <p className="muted">Wybierz ogłoszenie z rynku, żeby zobaczyć jego stan, dowody ze Steama i dostępne kroki.</p>
+        <p className="muted">
+          {role === "seller"
+            ? "Wybierz swoje ogłoszenie, żeby zobaczyć jego stan, dowody ze Steama i kolejne kroki."
+            : "Wybierz ogłoszenie z rynku, żeby zobaczyć jego stan, dowody ze Steama i dostępne kroki."}
+        </p>
       </Card>
     );
   }
   const label = dealLabel(deal, now);
   const isSeller = owner?.equals(deal.seller) ?? false;
+  const sellerView = role === "seller";
   const end = windowEnd(deal);
   const busy = runner.busy || !owner;
 
@@ -130,70 +137,95 @@ export function DealPanel({ deal, now, owner, runner, proofs, look, onAttest, on
 
       <div className="actions">
         {deal.status === "listed" ? (
-          <>
-            {!deal.listingVerified ? (
-              <button disabled={busy} onClick={() => onAttest("listing")}>
-                Potwierdź w Steam, że skin jest u sprzedającego
-              </button>
-            ) : null}
-            {isSeller ? (
-              <button disabled={busy} onClick={onCancel}>
-                Wycofaj ogłoszenie
-              </button>
-            ) : (
+          sellerView ? (
+            <>
+              {!deal.listingVerified ? (
+                <button className="primary" disabled={busy} onClick={() => onAttest("listing")}>
+                  Potwierdź w Steam, że skin jest u mnie
+                </button>
+              ) : (
+                <span className="muted">Ogłoszenie jest na rynku. Czekasz na kupującego, pieniądze trafią do sejfu programu.</span>
+              )}
+              {isSeller ? (
+                <button disabled={busy} onClick={onCancel}>
+                  Wycofaj ogłoszenie
+                </button>
+              ) : null}
+            </>
+          ) : (
+            <>
               <div className="row">
                 <label className="field">
                   Twój SteamID64 (tu przyjdzie skin)
                   <input value={buyerSteam} onChange={(e) => setBuyerSteam(e.target.value)} inputMode="numeric" />
                 </label>
-                <button className="primary" disabled={busy || !deal.listingVerified} onClick={() => onFund(buyerSteam)}>
+                <button className="primary" disabled={busy || !deal.listingVerified || isSeller} onClick={() => onFund(buyerSteam)}>
                   Kup za {formatUsdc(deal.price)}
                 </button>
               </div>
-            )}
-            {!deal.listingVerified ? (
-              <span className="muted small">Kupić można dopiero, gdy Steam potwierdzi, że skin jest u sprzedającego. Program tego pilnuje.</span>
-            ) : !isSeller ? (
-              <span className="muted small">
-                Przed płatnością Steam musi pokazać, że Twoje inventory jest publiczne (inaczej dostawy nie da się udowodnić). Nie ukrywaj go do końca
-                transakcji: ukrycie po zapłacie, a przed dostawą, oznacza wypłatę dla sprzedającego.
-              </span>
-            ) : null}
-          </>
+              {isSeller ? (
+                <span className="muted small">To Twoje ogłoszenie. Kup coś od innego sprzedającego albo przełącz się na widok sprzedającego.</span>
+              ) : !deal.listingVerified ? (
+                <span className="muted small">Kupić można dopiero, gdy Steam potwierdzi, że skin jest u sprzedającego. Program tego pilnuje.</span>
+              ) : (
+                <span className="muted small">
+                  Przed płatnością Steam musi pokazać, że Twoje inventory jest publiczne (inaczej dostawy nie da się udowodnić). Nie ukrywaj go do końca
+                  transakcji: ukrycie po zapłacie, a przed dostawą, oznacza wypłatę dla sprzedającego.
+                </span>
+              )}
+            </>
+          )
         ) : null}
 
         {deal.status === "funded" ? (
-          <>
-            <button className="primary" disabled={busy} onClick={() => onAttest("delivery")}>
-              Sprawdź w Steam, czy skin dotarł
-            </button>
-            {now > deal.deliveryDeadline ? (
-              <button disabled={busy} onClick={onRefund}>
-                Zwróć pieniądze kupującemu (minął termin dostawy)
+          sellerView ? (
+            <>
+              <span className="muted">Pieniądze są w sejfie programu. Wyślij skina zwykłą wymianą na Steamie (w demo: w symulatorze poniżej), potem sprawdź dostawę.</span>
+              <button className="primary" disabled={busy} onClick={() => onAttest("delivery")}>
+                Sprawdź w Steam, czy skin dotarł
               </button>
-            ) : null}
-            <button className="link" disabled={busy} onClick={() => onAttest("buyer_hidden")}>
-              Kupujący ukrył inventory po zapłacie? Zgłoś (sprzedający dostaje pieniądze)
-            </button>
-          </>
+              <button className="link" disabled={busy} onClick={() => onAttest("buyer_hidden")}>
+                Kupujący ukrył inventory po zapłacie? Zgłoś (dostajesz pieniądze)
+              </button>
+            </>
+          ) : (
+            <>
+              <span className="muted">Zapłacono. Pieniądze są w sejfie programu, sprzedający ma czas na wysłanie skina do {formatTime(deal.deliveryDeadline)}.</span>
+              {now > deal.deliveryDeadline ? (
+                <button className="primary" disabled={busy} onClick={onRefund}>
+                  Odzyskaj pieniądze (minął termin dostawy)
+                </button>
+              ) : null}
+            </>
+          )
         ) : null}
 
         {deal.status === "delivered" ? (
-          <>
-            {now > end ? (
-              <button className="primary" disabled={busy} onClick={onFinalize}>
-                Wypłać sprzedającemu {formatUsdc(deal.price)}
+          sellerView ? (
+            <>
+              {now > end ? (
+                <button className="primary" disabled={busy} onClick={onFinalize}>
+                  Wypłać mi {formatUsdc(deal.price)}
+                </button>
+              ) : (
+                <span className="muted">Wypłata możliwa za {formatDuration(end - now)}, jeśli nikt nie udowodni cofnięcia wymiany.</span>
+              )}
+            </>
+          ) : (
+            <>
+              <span className="muted">
+                {now > end
+                  ? "Okno cofnięcia minęło. Sprzedający może odebrać pieniądze."
+                  : `Skin dotarł. Okno cofnięcia trwa jeszcze ${formatDuration(end - now)}: jeśli sprzedający cofnie wymianę, dostaniesz zwrot.`}
+              </span>
+              <button disabled={busy || now > end} onClick={() => onAttest("reversal")}>
+                Sprawdź w Steam, czy wymiana nie została cofnięta
               </button>
-            ) : (
-              <span className="muted">Wypłata możliwa za {formatDuration(end - now)}, jeśli nikt nie udowodni cofnięcia.</span>
-            )}
-            <button disabled={busy} onClick={() => onAttest("reversal")}>
-              Sprawdź w Steam, czy wymiana nie została cofnięta
-            </button>
-            <button className="link" disabled={busy} onClick={() => onAttest("seller_hidden")}>
-              Sprzedający ukrył inventory? Zgłoś
-            </button>
-          </>
+              <button className="link" disabled={busy || now > end} onClick={() => onAttest("seller_hidden")}>
+                Sprzedający ukrył inventory? Zgłoś (dostajesz zwrot)
+              </button>
+            </>
+          )
         ) : null}
       </div>
 

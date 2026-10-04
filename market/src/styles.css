@@ -641,3 +641,57 @@ code {
   padding: 1px 5px;
   border-radius: 5px;
 }
+
+.picker-title {
+  margin: 8px 0 0;
+  font-size: 1.4rem;
+}
+
+.role-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.role-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
+  padding: 18px;
+  border-radius: var(--radius);
+  background: var(--panel);
+  box-shadow: var(--shadow);
+  font-weight: 400;
+}
+
+.role-tile:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.role-tile b {
+  font-size: 1.15rem;
+}
+
+.role-tile ul {
+  margin: 0;
+  padding-left: 18px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.role-icon {
+  font-size: 2rem;
+}
+
+.role-icon.small-icon {
+  font-size: 1.2rem;
+}
+
+.role-bar {
+  padding: 8px 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}

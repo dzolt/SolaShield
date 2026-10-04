@@ -6,6 +6,7 @@ import { DealPanel } from "./components/DealPanel";
 import { Header } from "./components/Header";
 import { HowItWorks } from "./components/HowItWorks";
 import { MarketGrid } from "./components/MarketGrid";
+import { RoleBar, RolePicker } from "./components/RolePicker";
 import { SellPanel } from "./components/SellPanel";
 import { SteamSimulator } from "./components/SteamSimulator";
 import { explorerTx } from "./config";
@@ -13,9 +14,10 @@ import { loadSnapshot } from "./data";
 import { explainError } from "./errors";
 import { useActionRunner, useChainClock, usePoll, useToasts, type ActionOutcome } from "./hooks";
 import { makeProgram } from "./program";
+import { BUYER_FILTERS, roleFromUrl, SELLER_FILTERS, writeRoleToUrl, type Role } from "./roles";
 import { Toasts, TxStatus } from "./ui";
 
-type Tab = "market" | "sell";
+type SellerTab = "sell" | "mine";
 type Look = { icon?: string; color?: string };
 type Proofs = Record<string, AttestResult[]>;
 
@@ -53,7 +55,8 @@ export function App() {
   }, [reloadSnapshot, reloadSim]);
   const runner = useActionRunner(toast, reloadAll, explorerTx);
 
-  const [tab, setTab] = useState<Tab>("market");
+  const [role, setRole] = useState<Role | undefined>(roleFromUrl);
+  const [tab, setTab] = useState<SellerTab>("sell");
   const [selected, setSelected] = useState<string | undefined>(undefined);
   const [proofs, setProofs] = useState<Proofs>(loadProofs);
   const [extraLooks, setExtraLooks] = useState<Record<string, Look>>({});
@@ -76,6 +79,13 @@ export function App() {
     });
   }, []);
 
+  const pick = (next: Role | undefined) => {
+    writeRoleToUrl(next);
+    setRole(next);
+    setSelected(undefined);
+    setTab("sell");
+  };
+
   const needWallet = () => {
     if (!wallet || !owner) throw new Error("Połącz portfel.");
     return { wallet, owner };
@@ -86,7 +96,7 @@ export function App() {
       const { owner: seller } = needWallet();
       const listed = await createListing(program, seller, steamId, item, price);
       setSelected(listed.deal.toBase58());
-      setTab("market");
+      setTab("mine");
       try {
         const verified = await verifyListing(program, seller, listed.deal);
         addProof(verified.attestation);
@@ -114,75 +124,91 @@ export function App() {
   return (
     <div className="app">
       <Header owner={owner} wallet={snapshot.data?.wallet} runner={runner} onClaim={() => void runner.run(() => claimTokens(needWallet().wallet))} />
-      <HowItWorks />
       {snapshot.error ? <p className="banner">Nie udało się odczytać łańcucha: {snapshot.error}</p> : null}
 
-      <div className="layout">
-        <div className="stack">
-          <div className="tabs">
-            <button className={tab === "market" ? "active" : ""} onClick={() => setTab("market")}>
-              Rynek
-            </button>
-            <button className={tab === "sell" ? "active" : ""} onClick={() => setTab("sell")}>
-              Wystaw skina
-            </button>
-          </div>
-          {tab === "market" ? (
-            <MarketGrid deals={deals} now={now} owner={owner} selected={selected} iconFor={lookFor} onSelect={setSelected} />
-          ) : (
-            <SellPanel
+      {!role ? (
+        <>
+          <RolePicker onPick={pick} />
+          <HowItWorks />
+        </>
+      ) : (
+        <>
+          <RoleBar role={role} onBack={() => pick(undefined)} />
+          <div className="layout">
+            <div className="stack">
+              {role === "seller" ? (
+                <>
+                  <div className="tabs">
+                    <button className={tab === "sell" ? "active" : ""} onClick={() => setTab("sell")}>
+                      Wystaw skina
+                    </button>
+                    <button className={tab === "mine" ? "active" : ""} onClick={() => setTab("mine")}>
+                      Moje ogłoszenia
+                    </button>
+                  </div>
+                  {tab === "sell" ? (
+                    <SellPanel
+                      owner={owner}
+                      runner={runner}
+                      onLoaded={(items) => setExtraLooks((current) => ({ ...current, ...Object.fromEntries(items.map((i) => [i.name, { icon: i.icon, color: i.color }])) }))}
+                      onList={onList}
+                    />
+                  ) : (
+                    <MarketGrid key="seller" title="Moje ogłoszenia" filters={SELLER_FILTERS} deals={deals} now={now} owner={owner} selected={selected} iconFor={lookFor} onSelect={setSelected} />
+                  )}
+                </>
+              ) : (
+                <MarketGrid key="buyer" title="Rynek" filters={BUYER_FILTERS} deals={deals} now={now} owner={owner} selected={selected} iconFor={lookFor} onSelect={setSelected} />
+              )}
+            </div>
+            <DealPanel
+              role={role}
+              deal={deal}
+              now={now}
               owner={owner}
               runner={runner}
-              onLoaded={(items) => setExtraLooks((current) => ({ ...current, ...Object.fromEntries(items.map((i) => [i.name, { icon: i.icon, color: i.color }])) }))}
-              onList={onList}
+              proofs={deal ? (proofs[deal.address.toBase58()] ?? []) : []}
+              look={deal ? lookFor(deal.itemName) : {}}
+              onAttest={onAttest}
+              onFund={(steamId) =>
+                withDeal(async (buyer, d) => {
+                  const funded = await fund(program, buyer, d, steamId);
+                  addProof(funded.attestation);
+                  return funded.outcome;
+                })
+              }
+              onCancel={() => withDeal((seller, d) => cancelListing(program, seller, d))}
+              onFinalize={() => withDeal((submitter, d) => finalize(program, submitter, d))}
+              onRefund={() => withDeal((submitter, d) => refund(program, submitter, d))}
             />
-          )}
-        </div>
-        <DealPanel
-          deal={deal}
-          now={now}
-          owner={owner}
-          runner={runner}
-          proofs={deal ? (proofs[deal.address.toBase58()] ?? []) : []}
-          look={deal ? lookFor(deal.itemName) : {}}
-          onAttest={onAttest}
-          onFund={(steamId) =>
-            withDeal(async (buyer, d) => {
-              const funded = await fund(program, buyer, d, steamId);
-              addProof(funded.attestation);
-              return funded.outcome;
-            })
-          }
-          onCancel={() => withDeal((seller, d) => cancelListing(program, seller, d))}
-          onFinalize={() => withDeal((submitter, d) => finalize(program, submitter, d))}
-          onRefund={() => withDeal((submitter, d) => refund(program, submitter, d))}
-        />
-      </div>
+          </div>
 
-      <SteamSimulator
-        accounts={sim.data}
-        error={sim.error}
-        deal={deal}
-        busy={runner.busy}
-        onMove={(from, to, assetid) =>
-          void runner.run(async () => {
-            const moved = await simMove(from, to, assetid);
-            return { message: `Wymiana w symulatorze wykonana. Przedmiot dostał nowe ID: ${moved.newAssetId}.` };
-          })
-        }
-        onPrivacy={(steamId, isPrivate) =>
-          void runner.run(async () => {
-            await simPrivacy(steamId, isPrivate);
-            return { message: isPrivate ? "Inventory ukryte." : "Inventory znowu publiczne." };
-          })
-        }
-        onReset={() =>
-          void runner.run(async () => {
-            await simReset();
-            return { message: "Przywrócono inventory demo." };
-          })
-        }
-      />
+          <SteamSimulator
+            accounts={sim.data}
+            error={sim.error}
+            deal={deal}
+            busy={runner.busy}
+            onMove={(from, to, assetid) =>
+              void runner.run(async () => {
+                const moved = await simMove(from, to, assetid);
+                return { message: `Wymiana w symulatorze wykonana. Przedmiot dostał nowe ID: ${moved.newAssetId}.` };
+              })
+            }
+            onPrivacy={(steamId, isPrivate) =>
+              void runner.run(async () => {
+                await simPrivacy(steamId, isPrivate);
+                return { message: isPrivate ? "Inventory ukryte." : "Inventory znowu publiczne." };
+              })
+            }
+            onReset={() =>
+              void runner.run(async () => {
+                await simReset();
+                return { message: "Przywrócono inventory demo." };
+              })
+            }
+          />
+        </>
+      )}
       <TxStatus busy={runner.busy} state={runner.phase} />
       <Toasts toasts={toast.toasts} dismiss={toast.dismiss} />
     </div>
