@@ -7,7 +7,7 @@
 # It only touches ~/proofswap-demo and the compose project "proofswap-demo"; nothing else on the server.
 set -euo pipefail
 
-HOST="${DEPLOY_HOST:-ubuntu@146.59.92.151}"
+HOST="${DEPLOY_HOST:-ubuntu@}"
 REMOTE_DIR="proofswap-demo"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STAGE="$ROOT/deploy/.stage"
@@ -43,7 +43,7 @@ stage_files() {
   # Only the attestor key goes to the server, never the deployer key. The RPC URL comes from the local app config.
   cp "$ROOT/keys/attestor.json" "$STAGE/secrets/attestor.json"
   rpc="$(grep -E '^VITE_RPC_URL=' "$ROOT/market/.env.local" 2>/dev/null | head -1 | cut -d= -f2- || true)"
-  printf 'RPC_URL=%s\n' "${rpc:-https://api.devnet.solana.com}" > "$STAGE/.env"
+  printf 'RPC_URL=%s\n' "${rpc:-https://api.devnet.solana.com}" >"$STAGE/.env"
   unset rpc
 }
 
@@ -54,29 +54,29 @@ upload() {
 }
 
 case "${1:-}" in
-  up)
-    build_apps
-    stage_files
-    upload
-    ssh "$HOST" "$COMPOSE up -d --build --remove-orphans"
-    echo "== waiting for the tunnels"
-    sleep 15
-    "$0" urls
-    ;;
-  urls)
-    for t in market will; do
-      printf '%s: ' "$t"
-      ssh "$HOST" "$COMPOSE logs --no-log-prefix tunnel-$t 2>&1" | grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' | tail -1 || echo "(no address yet)"
-    done
-    ;;
-  logs)
-    ssh "$HOST" "$COMPOSE logs -f --tail 100"
-    ;;
-  down)
-    ssh "$HOST" "$COMPOSE down --rmi local -v --remove-orphans; cd ~ && rm -rf ~/$REMOTE_DIR"
-    ;;
-  *)
-    echo "usage: deploy/ship.sh up|urls|logs|down" >&2
-    exit 2
-    ;;
+up)
+  build_apps
+  stage_files
+  upload
+  ssh "$HOST" "$COMPOSE up -d --build --remove-orphans"
+  echo "== waiting for the tunnels"
+  sleep 15
+  "$0" urls
+  ;;
+urls)
+  for t in market will; do
+    printf '%s: ' "$t"
+    ssh "$HOST" "$COMPOSE logs --no-log-prefix tunnel-$t 2>&1" | grep -o 'https://[a-z0-9-]*\.trycloudflare\.com' | tail -1 || echo "(no address yet)"
+  done
+  ;;
+logs)
+  ssh "$HOST" "$COMPOSE logs -f --tail 100"
+  ;;
+down)
+  ssh "$HOST" "$COMPOSE down --rmi local -v --remove-orphans; cd ~ && rm -rf ~/$REMOTE_DIR"
+  ;;
+*)
+  echo "usage: deploy/ship.sh up|urls|logs|down" >&2
+  exit 2
+  ;;
 esac
