@@ -3,6 +3,7 @@ import type { HeirDraft } from "../actions";
 import { MAX_BENEFICIARIES, TOTAL_BPS } from "../config";
 import type { Will } from "../data";
 import { formatPercent } from "../format";
+import { Section } from "../ui";
 
 interface HeirsEditorProps {
   readonly will: Will;
@@ -32,8 +33,8 @@ export function HeirsEditor({ will, busy, onSave, onLock }: HeirsEditorProps) {
   const sum = percentSum(drafts);
 
   return (
-    <div className="stack">
-      <h3>Spadkobiercy (lista nie jest jeszcze ostateczna)</h3>
+    <Section title="Spadkobiercy i udziały">
+      <p className="muted">Wklej adresy portfeli i procenty. Razem muszą dać 100%. Dopóki nie zablokujesz listy, możesz ją zmieniać.</p>
       {drafts.map((d, i) => (
         <div key={i} className="row heir-input">
           <input className="grow" placeholder="adres portfela spadkobiercy" value={d.wallet} onChange={(e) => update(i, { wallet: e.target.value })} />
@@ -47,7 +48,7 @@ export function HeirsEditor({ will, busy, onSave, onLock }: HeirsEditorProps) {
         <button className="chip" disabled={drafts.length >= MAX_BENEFICIARIES} onClick={() => setDrafts((current) => [...current, EMPTY])}>
           + dodaj osobę
         </button>
-        <span className={`small ${sum === TOTAL_BPS ? "" : "warn-text"}`}>razem {formatPercent(sum)}</span>
+        <span className={`small ${sum === TOTAL_BPS ? "muted" : "warn-text"}`}>razem {formatPercent(sum)}{sum === TOTAL_BPS ? " ✓" : " (ma być 100%)"}</span>
       </div>
       <div className="row">
         <button className="primary" disabled={busy} onClick={() => onSave(drafts)}>
@@ -57,6 +58,7 @@ export function HeirsEditor({ will, busy, onSave, onLock }: HeirsEditorProps) {
           Zablokuj listę na zawsze
         </button>
       </div>
-    </div>
+    </Section>
   );
 }
+

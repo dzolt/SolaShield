@@ -1,0 +1,1133 @@
+/*
+ * Shared look of ProofSwap (market/) and Sejf spadkowy (will/).
+ * Every colour comes from a token that each app defines in its own theme.css, so the two products
+ * share structure, spacing and behaviour but not their palette.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  color-scheme: light;
+  scrollbar-gutter: stable; /* no sideways jump when the page grows past the window height */
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg-glow), var(--bg);
+  background-repeat: no-repeat;
+  color: var(--text);
+  font-family: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  font-variant-numeric: tabular-nums;
+}
+
+p {
+  margin: 0; /* spacing comes from .stack gaps and .section, not from browser defaults */
+}
+
+.card > p {
+  margin-bottom: 14px;
+}
+
+.card > * + p,
+.card > * + .banner {
+  margin-top: 12px;
+}
+
+a {
+  color: var(--accent);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--accent-strong);
+}
+
+::selection {
+  background: var(--accent-soft);
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8em;
+  background: var(--surface-3);
+  padding: 1px 6px;
+  border-radius: 6px;
+}
+
+/* ---------- layout ---------- */
+
+.app {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 20px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.row.between {
+  justify-content: space-between;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.muted {
+  color: var(--muted);
+  font-size: 0.875rem;
+}
+
+.small {
+  font-size: 0.82rem;
+}
+
+.tiny {
+  font-size: 0.72rem;
+}
+
+.big {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+/* ---------- header ---------- */
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+.header > div:first-child {
+  flex: 1 1 340px;
+  min-width: 0;
+}
+
+.header .wallet-box {
+  flex: 0 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.65rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.logo {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: var(--brand-gradient);
+  color: #fff;
+  font-size: 1.25rem;
+  box-shadow: 0 6px 16px var(--accent-shadow);
+}
+
+.tagline {
+  margin: 8px 0 10px;
+  color: var(--muted);
+  max-width: 62ch;
+}
+
+.wallet-box {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.wallet-box .row {
+  justify-content: flex-end;
+}
+
+.wallet-box .row b {
+  font-weight: 700;
+}
+
+/* Narrow screens: the header wraps, so the wallet block takes the full width instead of floating at its content width. */
+@media (max-width: 720px) {
+  .app {
+    padding: 20px 16px 96px;
+  }
+
+  .header > * {
+    width: 100%;
+  }
+
+  .header .wallet-box {
+    flex: 1 1 100%;
+  }
+
+  .wallet-box {
+    align-items: stretch;
+  }
+
+  .wallet-box .wallet-adapter-button {
+    width: 100%;
+  }
+
+  .wallet-box .row {
+    justify-content: space-between;
+  }
+
+  .wallet-box .row button {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- cards ---------- */
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  box-shadow: var(--shadow-sm);
+  min-width: 0;
+}
+
+.card-head {
+  margin-bottom: 16px;
+  min-height: 34px; /* the same title row in every card, so side-by-side cards line up */
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.card h3 {
+  margin: 0;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* A titled block inside a card, separated from the previous one by a hairline. */
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.section:first-child {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .stats {
+    grid-template-columns: 1fr;
+  }
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-width: 0;
+}
+
+.stat .muted {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.stat b {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.stat a {
+  font-weight: 700;
+  text-decoration: none;
+}
+
+/* ---------- badges ---------- */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1.5;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  width: fit-content;
+  white-space: nowrap;
+}
+
+.badge.ok {
+  background: var(--ok-soft);
+  color: var(--ok);
+}
+
+.badge.warn {
+  background: var(--warn-soft);
+  color: var(--warn);
+}
+
+.badge.bad {
+  background: var(--bad-soft);
+  color: var(--bad);
+}
+
+.proof .badge,
+.tile .badge {
+  white-space: normal;
+  border-radius: 12px;
+}
+
+/* ---------- avatars (colour derived from the address) ---------- */
+
+.avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.02em;
+}
+
+.party {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.party a {
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* ---------- buttons ---------- */
+
+button {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 42px;
+  padding: 9px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-xs);
+  transition: background-color 0.15s, border-color 0.15s, box-shadow 0.15s, transform 0.06s;
+}
+
+button:hover:not(:disabled) {
+  background: var(--surface-2);
+  border-color: var(--accent);
+}
+
+button:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+button:focus-visible,
+input:focus-visible,
+.role-tile:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--on-accent);
+  box-shadow: 0 1px 2px var(--accent-shadow);
+}
+
+button.primary:hover:not(:disabled) {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+}
+
+button.big-button {
+  padding: 14px 18px;
+  font-size: 1rem;
+  width: 100%;
+}
+
+button.chip,
+button.link,
+.tile button {
+  min-height: 0;
+}
+
+button.chip {
+  padding: 5px 13px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
+
+button.chip.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+button.link {
+  background: none;
+  border: none;
+  box-shadow: none;
+  color: var(--muted);
+  padding: 2px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  font-weight: 500;
+  text-align: left;
+}
+
+button.link:hover:not(:disabled) {
+  background: none;
+  color: var(--text);
+}
+
+button.danger {
+  color: var(--bad);
+  border-color: var(--bad-border);
+}
+
+button.danger:hover:not(:disabled) {
+  background: var(--bad-soft);
+  border-color: var(--bad);
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* A row of a field plus its button: the button lines up with the field, not with the label above it. */
+.row.form-row {
+  align-items: flex-end;
+}
+
+.card > .tabs {
+  display: flex;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.card > .tabs button {
+  flex: 1;
+}
+
+.tabs {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: var(--surface-3);
+  border-radius: 14px;
+  width: fit-content;
+}
+
+.tabs button {
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  color: var(--muted);
+  padding: 8px 16px;
+}
+
+.tabs button:hover:not(:disabled) {
+  background: transparent;
+  color: var(--text);
+}
+
+.tabs button.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---------- forms ---------- */
+
+input {
+  font: inherit;
+  min-height: 42px;
+  padding: 9px 13px;
+  border-radius: 12px;
+  border: 1px solid var(--border-strong);
+  background: var(--surface);
+  color: var(--text);
+  min-width: 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input::placeholder {
+  color: var(--faint);
+}
+
+input:hover:not(:disabled) {
+  border-color: var(--muted);
+}
+
+input:focus {
+  border-color: var(--accent);
+}
+
+input[type="checkbox"] {
+  min-height: 0;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+input.grow,
+label.field.grow {
+  flex: 1;
+}
+
+label.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+/* ---------- progress ---------- */
+
+.progress {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ok);
+  transition: width 0.6s ease;
+}
+
+.progress.warn > span {
+  background: var(--warn);
+}
+
+.progress.bad > span {
+  background: var(--bad);
+}
+
+/* ---------- notices ---------- */
+
+.banner {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-border);
+  color: var(--warn);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0;
+}
+
+.hint {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 0.88rem;
+  margin: 0;
+}
+
+.danger-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 12px;
+  border: 1px solid var(--bad-border);
+  background: var(--bad-soft);
+}
+
+.danger-zone .muted {
+  color: var(--bad);
+}
+
+.danger-zone button {
+  align-self: flex-start;
+  background: var(--surface);
+}
+
+/* ---------- toasts and transaction status ---------- */
+
+.toasts {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  z-index: 50;
+  max-width: min(440px, calc(100vw - 32px));
+}
+
+.toast,
+.txstatus {
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  font-size: 0.9rem;
+}
+
+.toast {
+  border-left: 4px solid var(--accent);
+  cursor: pointer;
+}
+
+.toast.success {
+  border-left-color: var(--ok);
+}
+
+.toast.error {
+  border-left-color: var(--bad);
+}
+
+.txstatus {
+  position: fixed;
+  left: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  z-index: 50;
+}
+
+.txstatus .spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  animation: txspin 0.8s linear infinite;
+}
+
+@keyframes txspin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 560px) {
+  .toasts,
+  .txstatus {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    max-width: none;
+  }
+
+  .toasts {
+    bottom: 64px;
+  }
+}
+
+/* ---------- how it works ---------- */
+
+.how {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 12px;
+}
+
+.how-step {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.how-step b {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.how-step span {
+  color: var(--muted);
+}
+
+.how-step.trust {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+.how-step.trust span {
+  color: var(--text);
+}
+
+/* ---------- role picker ---------- */
+
+.picker-title {
+  margin: 8px 0 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.role-tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.role-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  text-align: left;
+  padding: 24px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  font-weight: 400;
+  transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+}
+
+.role-tile:hover:not(:disabled) {
+  background: var(--surface);
+  border-color: var(--accent);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-lg);
+}
+
+.role-tile b {
+  font-size: 1.2rem;
+  letter-spacing: -0.02em;
+}
+
+.role-tile ul {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.role-tile li {
+  display: flex;
+  gap: 8px;
+}
+
+.role-tile li::before {
+  content: "✓";
+  color: var(--ok);
+  font-weight: 800;
+}
+
+.role-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: var(--accent-soft);
+  font-size: 1.7rem;
+}
+
+.role-icon.small-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  font-size: 1rem;
+  vertical-align: middle;
+}
+
+.role-bar {
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  box-shadow: var(--shadow-xs);
+}
+
+/* ---------- timeline (steps of a deal) ---------- */
+
+.steps {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.steps li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 2px 0 18px 38px;
+  font-size: 0.9rem;
+}
+
+.steps li:last-child {
+  padding-bottom: 0;
+}
+
+.steps li b {
+  font-weight: 650;
+}
+
+.steps li span {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.steps li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 2px solid var(--border-strong);
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.steps li::after {
+  content: "";
+  position: absolute;
+  left: 12px;
+  top: 30px;
+  bottom: 2px;
+  width: 2px;
+  background: var(--border);
+}
+
+.steps li:last-child::after {
+  display: none;
+}
+
+.steps li.done::before {
+  content: "✓";
+  background: var(--ok);
+  border-color: var(--ok);
+  color: #fff;
+}
+
+.steps li.done::after {
+  background: var(--ok);
+}
+
+.steps li.active::before {
+  border-color: var(--warn);
+  background: radial-gradient(circle, var(--warn) 0 4px, var(--surface) 5px);
+  box-shadow: 0 0 0 4px var(--warn-soft);
+}
+
+.steps li.failed::before {
+  content: "✕";
+  background: var(--bad);
+  border-color: var(--bad);
+  color: #fff;
+}
+
+/* ---------- tables ---------- */
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+table.heirs {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 0.9rem;
+}
+
+table.heirs th {
+  text-align: left;
+  padding: 0 12px 8px 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+table.heirs td {
+  padding: 12px 12px 12px 0;
+  border-top: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+table.heirs td.amount {
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.heir-cell {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.share {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 84px;
+}
+
+.share-bar {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--surface-3);
+  overflow: hidden;
+}
+
+.share-bar span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent);
+}
+
+@media (max-width: 560px) {
+  table.heirs thead {
+    display: none;
+  }
+
+  table.heirs,
+  table.heirs tbody {
+    display: block;
+  }
+
+  table.heirs tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px 12px;
+    align-items: center;
+    padding: 14px 0;
+    border-top: 1px solid var(--border);
+  }
+
+  table.heirs td {
+    display: block;
+    padding: 0;
+    border: none;
+  }
+
+  table.heirs td:nth-child(2) {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  table.heirs td:nth-child(4) {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  table.heirs td:nth-child(4):empty {
+    display: none;
+  }
+
+  .share {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .share b {
+    min-width: 40px;
+  }
+
+  .share-bar {
+    flex: 1;
+  }
+}
+
+/* ---------- wallet button and dialog (third-party markup, restyled to the theme) ---------- */
+
+.wallet-adapter-button {
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  font-size: 0.92rem !important;
+  height: 44px !important;
+  padding: 0 20px !important;
+  border-radius: 12px !important;
+  justify-content: center;
+  transition: background-color 0.15s, box-shadow 0.15s !important;
+}
+
+.wallet-adapter-button-trigger {
+  background-color: var(--accent) !important;
+  color: var(--on-accent) !important;
+  box-shadow: 0 1px 2px var(--accent-shadow);
+}
+
+.wallet-adapter-button:not([disabled]):hover {
+  background-color: var(--accent-strong) !important;
+}
+
+.wallet-adapter-dropdown-list {
+  background: var(--surface) !important;
+  border: 1px solid var(--border);
+  border-radius: 14px !important;
+  box-shadow: var(--shadow-lg) !important;
+  padding: 6px !important;
+}
+
+.wallet-adapter-dropdown-list-item {
+  color: var(--text) !important;
+  font-family: inherit !important;
+  font-weight: 600 !important;
+  border-radius: 10px !important;
+}
+
+.wallet-adapter-dropdown-list-item:not([disabled]):hover {
+  background: var(--surface-2) !important;
+}
+
+.wallet-adapter-modal-overlay {
+  background: rgba(20, 22, 30, 0.45) !important;
+  backdrop-filter: blur(3px);
+}
+
+.wallet-adapter-modal-wrapper {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border-radius: 20px !important;
+  box-shadow: var(--shadow-lg) !important;
+  font-family: inherit !important;
+}
+
+.wallet-adapter-modal-title {
+  color: var(--text) !important;
+  font-family: inherit !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em;
+}
+
+.wallet-adapter-modal-button-close {
+  background: var(--surface-3) !important;
+}
+
+.wallet-adapter-modal-button-close svg {
+  fill: var(--muted) !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button {
+  color: var(--text) !important;
+  background-color: transparent !important;
+  border-radius: 12px !important;
+  box-shadow: none !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button:not([disabled]):hover {
+  background-color: var(--surface-2) !important;
+}
+
+.wallet-adapter-modal-list .wallet-adapter-button-end-icon,
+.wallet-adapter-modal-list .wallet-adapter-button-start-icon {
+  width: 28px !important;
+  height: 28px !important;
+}
+
+.wallet-adapter-modal-list-more {
+  color: var(--accent) !important;
+  font-family: inherit !important;
+}
+
+.wallet-adapter-modal-middle-button {
+  background-color: var(--accent) !important;
+  border-radius: 12px !important;
+}

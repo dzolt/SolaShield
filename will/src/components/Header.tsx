@@ -1,9 +1,9 @@
-import { WalletMultiButton } from "@solana/wallet-adapter-react-ui";
 import type { PublicKey } from "@solana/web3.js";
 import { explorerAddress, FAUCET_TOKENS, IS_DEVNET, PROGRAM_ID } from "../config";
 import type { WalletState } from "../data";
 import { formatUsdc, shortAddress } from "../format";
 import type { ActionRunner } from "../hooks";
+import { WalletButton } from "./WalletButton";
 
 interface HeaderProps {
   readonly owner: PublicKey | undefined;
@@ -17,7 +17,7 @@ export function Header({ owner, wallet, runner, onClaim }: HeaderProps) {
     <header className="header">
       <div>
         <div className="brand">
-          <span className="logo">⌛</span> Sejf spadkowy
+          <span className="logo">🌿</span> Ostatnia Wola Sola
         </div>
         <p className="tagline">
           Testament bez notariusza i bez banku. Odkładasz pieniądze do sejfu programu na Solanie. Jeśli przestaniesz się meldować, program sam podzieli je między
@@ -31,7 +31,7 @@ export function Header({ owner, wallet, runner, onClaim }: HeaderProps) {
         </div>
       </div>
       <div className="wallet-box">
-        <WalletMultiButton />
+        <WalletButton />
         {owner ? (
           <div className="row small">
             <span>{wallet ? `${wallet.sol.toFixed(3)} SOL` : "…"}</span>

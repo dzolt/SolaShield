@@ -1,5 +1,5 @@
 import type { PublicKey } from "@solana/web3.js";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { Deal } from "../data";
 import { formatUsdc, shortAddress } from "../format";
 import type { DealFilter } from "../roles";
@@ -8,6 +8,7 @@ import { Badge, Card } from "../ui";
 import { ItemTile } from "./ItemTile";
 
 interface MarketGridProps {
+  readonly top?: ReactNode;
   readonly title: string;
   readonly filters: readonly DealFilter[];
   readonly deals: readonly Deal[];
@@ -18,12 +19,13 @@ interface MarketGridProps {
   readonly onSelect: (address: string) => void;
 }
 
-export function MarketGrid({ title, filters, deals, now, owner, selected, iconFor, onSelect }: MarketGridProps) {
+export function MarketGrid({ top, title, filters, deals, now, owner, selected, iconFor, onSelect }: MarketGridProps) {
   const [filterId, setFilterId] = useState(filters[0]?.id);
   const filter = filters.find((f) => f.id === filterId) ?? filters[0];
   const shown = filter ? deals.filter((d) => filter.test(d, owner)) : [];
   return (
     <Card
+      top={top}
       title={title}
       aside={
         <div className="row small">

@@ -1,0 +1,38 @@
+/* Sejf spadkowy: warm, calm, light. Cream paper, sea green, a touch of gold. Structure lives in ../../ui/base.css. */
+:root {
+  --bg: #faf6ef;
+  --bg-glow: radial-gradient(900px 400px at 12% -140px, rgba(217, 164, 65, 0.2), transparent 70%),
+    radial-gradient(760px 360px at 96% -80px, rgba(29, 122, 107, 0.13), transparent 70%);
+  --surface: #fffefb;
+  --surface-2: #f8f3ea;
+  --surface-3: #efe8da;
+  --text: #2a2622;
+  --muted: #756e63;
+  --faint: #aaa295;
+  --border: #ece4d5;
+  --border-strong: #ddd2bf;
+
+  --accent: #1d7a6b;
+  --accent-strong: #155f53;
+  --accent-soft: #e2f2ee;
+  --accent-border: #b5dbd2;
+  --accent-shadow: rgba(29, 122, 107, 0.3);
+  --on-accent: #ffffff;
+
+  --ok: #2b8a57;
+  --ok-soft: #e0f3e7;
+  --warn: #a96a0b;
+  --warn-soft: #fcf0d4;
+  --warn-border: #f1d9a0;
+  --bad: #c0522c; /* warm coral: urgent, not alarming */
+  --bad-soft: #fdeee4;
+  --bad-border: #f1c9b3;
+  --gold: #d9a441;
+
+  --brand-gradient: linear-gradient(135deg, #3aa893, #1d7a6b);
+  --radius: 18px;
+  --shadow-xs: 0 1px 2px rgba(62, 45, 20, 0.06);
+  --shadow-sm: 0 1px 2px rgba(62, 45, 20, 0.04), 0 8px 24px rgba(62, 45, 20, 0.06);
+  --shadow-lg: 0 12px 40px rgba(62, 45, 20, 0.16);
+  --ring: 0 0 0 3px rgba(29, 122, 107, 0.25);
+}

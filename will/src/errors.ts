@@ -38,5 +38,9 @@ export function explainError(error: unknown): string {
   if (/AccountNotInitialized|could not find account|account does not exist/i.test(text)) return "Brakuje konta tUSDC. Kliknij najpierw „Odbierz testowe tUSDC”.";
   if (/ConstraintSeeds|seeds constraint/i.test(text)) return "Tylko właściciel sejfu może to zrobić.";
   if (/429|Too Many Requests/i.test(text)) return "RPC ogranicza zapytania. Spróbuj za chwilę.";
+  if (/simulation failed|custom program error|Instruction \d+/i.test(text)) {
+    const reason = text.match(/Error Message: ([^."\\]+)/)?.[1];
+    return reason ? `Program odrzucił transakcję: ${reason.trim()}.` : "Program odrzucił tę transakcję. Odśwież stronę i spróbuj jeszcze raz.";
+  }
   return text.length > 240 ? `${text.slice(0, 240)}…` : text;
 }

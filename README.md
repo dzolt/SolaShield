@@ -1,10 +1,12 @@
-# ⇄ ProofSwap: skiny CS2 od obcych, bez middlemana (Solana, Anchor)
+# ⇄ ProofSwap: wymiana aktywów cyfrowych między obcymi, bez pośrednika (Solana, Anchor)
 
-**Dla kogo:** gracze CS2, którzy kupują i sprzedają skiny poza Steam Market (Discord, Reddit, grupy wymiany), czyli z obcymi ludźmi, bez historii i bez możliwości dochodzenia czegokolwiek.
+**Dla kogo:** osoby, które kupują i sprzedają aktywa cyfrowe od obcych poza regulowanymi rynkami: bez historii, bez możliwości dochodzenia czegokolwiek i bez zaufanego pośrednika pod ręką. Pierwszy konkretny użytkownik w demo: gracz CS2, który wymienia skiny na Discordzie lub Reddicie.
 
-**Problem:** Steam Market bierze 15% prowizji (5% Steam + 10% CS2), pojedyncze ogłoszenie może kosztować najwyżej 1 800 USD, a pieniędzy z portfela Steam nie da się wypłacić. Duże wymiany idą więc przez „middlemanów” (zaufanych pośredników, pod których podszywają się oszuści) albo przez marketplace'y, które trzymają pieniądze i same rozstrzygają. Od lipca 2025 r. Steam pozwala sprzedającemu **cofnąć wymianę przez 7 dni** (Trade Protection): sprzedający może wziąć pieniądze, a potem odebrać skina.
+**Problem:** przy każdej wymianie aktywa za pieniądze ktoś musi zaufać pierwszy. Kupujący płaci i może nie dostać aktywa, sprzedający przekazuje je i może nie dostać pieniędzy. Zwykle ratuje to pośrednik (escrow, marketplace, „middleman”), który trzyma pieniądze, pobiera prowizję i sam rozstrzyga, a pod którego podszywają się oszuści. Przykład z CS2: Steam Market bierze 15% prowizji (5% Steam + 10% CS2), pojedyncze ogłoszenie może kosztować najwyżej 1 800 USD, a pieniędzy z portfela Steam nie da się wypłacić. Do tego od lipca 2025 r. Steam pozwala sprzedającemu **cofnąć wymianę przez 7 dni** (Trade Protection): sprzedający może wziąć pieniądze, a potem odebrać aktywo.
 
-**Rozwiązanie:** kupujący płaci do sejfu programu na Solanie. Sprzedający wysyła skina zwykłą wymianą na Steamie. Program wypłaca pieniądze dopiero wtedy, gdy Steam pokazuje skina w inventory kupującego **i** minie okno, w którym wymianę można cofnąć. Jeśli w tym oknie skin wróci do sprzedającego, kupujący dostaje zwrot. Pośrednika, który trzyma pieniądze i decyduje, nie ma.
+**Rozwiązanie:** kupujący płaci do sejfu programu na Solanie. Sprzedający przekazuje aktywo zwykłym kanałem. Program wypłaca pieniądze dopiero wtedy, gdy **publiczne źródło potwierdza, że aktywo jest u kupującego, i** minie okno, w którym przekazanie można cofnąć. Jeśli w tym oknie aktywo wróci do sprzedającego, kupujący dostaje zwrot. Pośrednika, który trzyma pieniądze i decyduje, nie ma.
+
+**Co jest ogólne, a co jest przykładem.** Ogólny jest mechanizm: sejf rządzony przez program, podpisane potwierdzenie faktu z publicznego źródła, okno cofnięcia, wypłata albo zwrot według reguł. Przykładem jest *adapter źródła*: w demo to Steam i skiny CS2 (potwierdzenie, że egzemplarz jest w publicznym inventory konta). Uczciwie: kod ma dziś **jeden adapter** (Steam/CS2), a opis aktywa w programie (nazwa, float, wzór) jest dopasowany do przedmiotów CS2. Kolejny rodzaj aktywa wymaga nowego adaptera w atestatorze i uogólnienia pól opisu, ale nie zmienia reguł wypłaty ani zwrotu.
 
 ## Gdzie znika pośrednik (kod)
 
@@ -31,7 +33,7 @@ Konto transakcji na łańcuchu przechowuje SteamID obu stron, odcisk przedmiotu,
 |---|---|---|
 | Sprzedający | wystawić i wycofać nieopłacone ogłoszenie | wypłacić pieniądze przed końcem okna cofnięcia |
 | Kupujący | zapłacić do sejfu | wyjąć pieniędzy z sejfu na własną rękę; zwrot przychodzi tylko według reguł programu |
-| Atestator | podpisać to, co widzi w publicznym inventory Steam | ruszyć pieniędzy ani wysłać ich nikomu poza kupującym i sprzedającym tej transakcji |
+| Atestator | podpisać to, co widzi w publicznym źródle (w demo: inventory Steam) | ruszyć pieniędzy ani wysłać ich nikomu poza kupującym i sprzedającym tej transakcji |
 | Każdy | wysłać podpisany dowód, uruchomić wypłatę albo zwrot, gdy minie termin | zmienić reguły |
 | Autor (my) | raz ustawić konfigurację (atestator, token, okna czasowe) | zmienić jej później: nie ma instrukcji administratora |
 
@@ -39,7 +41,7 @@ Kod programu na devnecie da się jeszcze podmienić kluczem wdrożeniowym. Ostat
 
 ## Atestator: co robi i czym różni się od pośrednika
 
-Program na Solanie nie ma dostępu do internetu, więc nie może sam zapytać Steama. Atestator ([`attestor/`](attestor/)) czyta **publiczne** inventory (`steamcommunity.com/inventory/<steamid>/730/2`), szuka egzemplarza po nazwie, floacie i wzorze i podpisuje, co zobaczył i kiedy. Nie trzyma pieniędzy i nie może ich wysłać nikomu spoza transakcji, a o wypłacie decydują reguły programu. Podpisany dowód może wysłać na łańcuch każdy, a każdą obserwację da się sprawdzić w tym samym publicznym inventory (hash dowodu jest zapisany na koncie transakcji).
+Program na Solanie nie ma dostępu do internetu, więc nie może sam zapytać źródła. Atestator ([`attestor/`](attestor/)) czyta **publiczne** źródło; w demo to inventory Steam (`steamcommunity.com/inventory/<steamid>/730/2`), w którym szuka egzemplarza po nazwie, floacie i wzorze i podpisuje, co zobaczył i kiedy. Nie trzyma pieniędzy i nie może ich wysłać nikomu spoza transakcji, a o wypłacie decydują reguły programu. Podpisany dowód może wysłać na łańcuch każdy, a każdą obserwację da się sprawdzić w tym samym publicznym inventory (hash dowodu jest zapisany na koncie transakcji).
 
 Uczciwie: w MVP atestator to jeden klucz, któremu program ufa. Może odmówić podpisu albo podpisać nieprawdę, a wtedy transakcja rozstrzygnie się źle. Następny krok to **zkTLS** (np. Reclaim, którego weryfikator działa już na Solanie): program sprawdza wtedy dowód samej odpowiedzi HTTPS ze Steama zamiast słowa jednego atestatora.
 
@@ -83,12 +85,12 @@ Lokalnie: walidator Surfpool w kontenerze, `solana program deploy target/deploy/
 | Klucz atestatora | `EhcyoHBQgb3CywfVyhVXjhW7AYgKTqqffXKFpPNVddt6` |
 | Token tUSDC (z otwartym faucetem) | `Dfxy54rAvVdZD2CKnEHe4J594q7PFixe5BJMJDx1yrdH` |
 
-## Sejf spadkowy (`programs/will_vault`)
+## Ostatnia Wola Sola (`programs/will_vault`)
 
 Testament bez notariusza: właściciel odkłada tUSDC do sejfu programu i wskazuje spadkobierców z procentami. Gdy przestanie się meldować, program sam dzieli saldo.
 
 - **Osobny adres i osobna pula na każdy testament** (PDA z właściciela i numeru, sejf na tokeny ma za właściciela ten PDA). Nic nie miesza się z ProofSwap ani z pulą ubezpieczeń.
-- **Czas:** cisza przez `inactivity_period` (produkcyjnie 90 dni), potem procedura `claim_period` (30 dni), potem wypłatę uruchamia `trigger_distribution` **dowolna osoba**. Okresy są w konfiguracji programu, w demo 20 s i 10 s.
+- **Czas:** cisza przez `inactivity_period` (produkcyjnie 90 dni), potem procedura `claim_period` (30 dni), potem wypłatę uruchamia `trigger_distribution` **dowolna osoba**. Okresy są w konfiguracji programu, na devnecie w demo 2 min i 1 min.
 - **Wpłacać i wypłacać może tylko właściciel**, a każda jego transakcja resetuje licznik. Dopóki nikt nie uruchomił wypłaty, może się też zameldować (`check_in`) albo anulować testament (`cancel_will`, wraca wszystko i opłata za konta).
 - **Spadkobiercy i procenty mogą być ostateczne** (`lock_beneficiaries`), a wpłaty dalej działają. Udziały liczy się od salda w chwili wypłaty. Ostateczny jest więc podział, nie kwota: właściciel nadal może wypłacić pieniądze albo anulować sejf.
 - **Strażnik** (jedna osoba) może zgłosić weto dopiero, gdy właściciel zamilkł, i najwyżej 2 razy do czasu, aż właściciel się zamelduje. Nie ma dostępu do pieniędzy.
@@ -111,9 +113,9 @@ attestor/                  atestator (czyta inventory Steam, podpisuje obserwacj
 market/                    aplikacja React + Wallet Adapter (Phantom): rynek, wystawianie, transakcja z dowodami
 scripts/proofswap-setup.ts konfiguracja programu na klastrze, kopiuje IDL do aplikacji
 scripts/proofswap-check.ts test dymny: sprzedaż, cofnięcie wymiany, odmowa fałszywej dostawy
-programs/will_vault/       program Anchor: sejf spadkowy (licznik ciszy, spadkobiercy, strażnik, wypłata na żądanie)
-will/                      aplikacja React dla sejfu spadkowego (port 5177)
-scripts/will-*.ts          konfiguracja i test dymny sejfu spadkowego
+programs/will_vault/       program Anchor: Ostatnia Wola Sola (licznik ciszy, spadkobiercy, strażnik, wypłata na żądanie)
+will/                      aplikacja React Ostatniej Woli Sola (port 5177)
+scripts/will-*.ts          konfiguracja i test dymny Ostatniej Woli Sola
 programs/micro_insurance/  wcześniejszy prototyp (SolaShield); ProofSwap korzysta tylko z jego otwartego faucetu tUSDC
 app/, scripts/*.ts         aplikacja i skrypty wcześniejszego prototypu
 ```

@@ -6,6 +6,6 @@ import { nodePolyfills } from "vite-plugin-node-polyfills";
 export default defineConfig({
   plugins: [react(), nodePolyfills({ include: ["buffer"], globals: { Buffer: true } })],
   resolve: { dedupe: ["@solana/web3.js", "@anchor-lang/core", "bn.js", "buffer", "vite-plugin-node-polyfills"] },
-  server: { port: 5177 },
+  server: { port: 5177, fs: { allow: [".."] } },
   build: { chunkSizeWarningLimit: 2_000 },
 });

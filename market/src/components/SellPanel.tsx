@@ -1,5 +1,5 @@
 import type { PublicKey } from "@solana/web3.js";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { getInventory, type InventoryItem, type InventoryResponse } from "../attestor";
 import { DEMO_SELLER_STEAM } from "../config";
 import { explainError } from "../errors";
@@ -8,6 +8,7 @@ import { Card } from "../ui";
 import { ItemTile } from "./ItemTile";
 
 interface SellPanelProps {
+  readonly top?: ReactNode;
   readonly owner: PublicKey | undefined;
   readonly runner: ActionRunner;
   readonly onLoaded: (items: readonly InventoryItem[]) => void;
@@ -15,7 +16,7 @@ interface SellPanelProps {
 }
 
 /** Pick a skin from a public Steam inventory (a demo account or any real one) and list it. */
-export function SellPanel({ owner, runner, onLoaded, onList }: SellPanelProps) {
+export function SellPanel({ top, owner, runner, onLoaded, onList }: SellPanelProps) {
   const [steamId, setSteamId] = useState(DEMO_SELLER_STEAM);
   const [inventory, setInventory] = useState<InventoryResponse | undefined>(undefined);
   const [error, setError] = useState<string | undefined>(undefined);
@@ -41,11 +42,11 @@ export function SellPanel({ owner, runner, onLoaded, onList }: SellPanelProps) {
 
   const sellable = inventory?.items.filter((i) => i.tradable && i.wear !== "") ?? [];
   return (
-    <Card title="Wystaw skina">
+    <Card top={top}>
       <p className="muted">
         Wczytaj publiczne inventory CS2. Domyślnie to konto demo z symulatora; prawdziwy SteamID64 z publicznym inventory czytamy wprost ze Steama.
       </p>
-      <div className="row">
+      <div className="row form-row">
         <label className="field grow">
           SteamID64 sprzedającego
           <input value={steamId} onChange={(e) => setSteamId(e.target.value)} inputMode="numeric" />

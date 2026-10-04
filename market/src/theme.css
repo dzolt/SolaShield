@@ -1,0 +1,37 @@
+/* ProofSwap: cool, precise, "tech and trust". Structure lives in ../../ui/base.css. */
+:root {
+  --bg: #f5f6fb;
+  --bg-glow: radial-gradient(900px 380px at 82% -120px, rgba(79, 107, 255, 0.15), transparent 70%);
+  --surface: #ffffff;
+  --surface-2: #f7f8fc;
+  --surface-3: #eceff7;
+  --text: #141a2e;
+  --muted: #5b6480;
+  --faint: #98a0b8;
+  --border: #e4e8f3;
+  --border-strong: #d2d8e8;
+
+  --accent: #4361ee;
+  --accent-strong: #3049d6;
+  --accent-soft: #eaeefe;
+  --accent-border: #c5d0fb;
+  --accent-shadow: rgba(67, 97, 238, 0.28);
+  --on-accent: #ffffff;
+
+  --ok: #0b8f63;
+  --ok-soft: #dcf5ea;
+  --warn: #b3620a;
+  --warn-soft: #fff3dc;
+  --warn-border: #f6d9a3;
+  --bad: #d03a48;
+  --bad-soft: #fdecee;
+  --bad-border: #f3b9bf;
+  --gold: #e4ae39;
+
+  --brand-gradient: linear-gradient(135deg, #5b7bff, #7b4dff);
+  --radius: 16px;
+  --shadow-xs: 0 1px 2px rgba(20, 26, 46, 0.05);
+  --shadow-sm: 0 1px 2px rgba(20, 26, 46, 0.04), 0 8px 24px rgba(20, 26, 46, 0.05);
+  --shadow-lg: 0 12px 40px rgba(20, 26, 46, 0.14);
+  --ring: 0 0 0 3px rgba(67, 97, 238, 0.25);
+}

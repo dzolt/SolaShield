@@ -5,6 +5,8 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { App } from "./App";
 import { RPC_URL } from "./config";
+import "../../ui/base.css";
+import "./theme.css";
 import "./styles.css";
 
 const root = document.getElementById("root");

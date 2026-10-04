@@ -33,9 +33,9 @@ export function formatDuration(seconds: number): string {
   const h = Math.floor((abs % 86400) / 3600);
   const m = Math.floor((abs % 3600) / 60);
   const s = abs % 60;
-  if (d > 0) return `${d} dni ${h} godz.`;
-  if (h > 0) return `${h} godz. ${m} min`;
-  if (m > 0) return `${m} min ${s} s`;
+  if (d > 0) return h > 0 ? `${d} dni ${h} godz.` : `${d} dni`;
+  if (h > 0) return m > 0 ? `${h} godz. ${m} min` : `${h} godz.`;
+  if (m > 0) return s > 0 ? `${m} min ${s} s` : `${m} min`;
   return `${s} s`;
 }
 

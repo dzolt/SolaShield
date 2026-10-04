@@ -7,7 +7,7 @@ import { formatDuration, formatTime, formatUsdc, shortAddress, shortWear } from 
 import type { ActionRunner } from "../hooks";
 import type { Role } from "../roles";
 import { dealLabel } from "../status";
-import { Badge, Card, Progress } from "../ui";
+import { Badge, Card, Party, Progress, Section } from "../ui";
 import { ItemTile } from "./ItemTile";
 import { ProofCard } from "./ProofCard";
 
@@ -106,14 +106,22 @@ export function DealPanel({ role, deal, now, owner, runner, proofs, look, onAtte
           <span className="muted" title={deal.wear}>
             float {shortWear(deal.wear)} · wzór {deal.pattern}
           </span>
-          <span className="muted">
-            Sprzedający <a href={explorerAddress(deal.seller.toBase58())} target="_blank" rel="noreferrer">{shortAddress(deal.seller)}</a> · Steam {deal.sellerSteamId}
-          </span>
-          {deal.buyer ? (
-            <span className="muted">
-              Kupujący <a href={explorerAddress(deal.buyer.toBase58())} target="_blank" rel="noreferrer">{shortAddress(deal.buyer)}</a> · Steam {deal.buyerSteamId}
-            </span>
-          ) : null}
+          <div className="parties">
+            <span className="muted small">Sprzedający</span>
+            <div className="party-line">
+              <Party address={deal.seller.toBase58()} short={shortAddress(deal.seller)} href={explorerAddress(deal.seller.toBase58())} />
+              <span className="muted small">Steam {deal.sellerSteamId}</span>
+            </div>
+            {deal.buyer ? (
+              <>
+                <span className="muted small">Kupujący</span>
+                <div className="party-line">
+                  <Party address={deal.buyer.toBase58()} short={shortAddress(deal.buyer)} href={explorerAddress(deal.buyer.toBase58())} />
+                  <span className="muted small">Steam {deal.buyerSteamId}</span>
+                </div>
+              </>
+            ) : null}
+          </div>
           <a className="small" href={explorerAddress(deal.address.toBase58())} target="_blank" rel="noreferrer">
             konto transakcji {shortAddress(deal.address)} w Explorerze
           </a>
@@ -159,7 +167,7 @@ export function DealPanel({ role, deal, now, owner, runner, proofs, look, onAtte
             </>
           ) : (
             <>
-              <div className="row">
+              <div className="row form-row">
                 <label className="field">
                   Twój SteamID64 (tu przyjdzie skin)
                   <input value={buyerSteam} onChange={(e) => setBuyerSteam(e.target.value)} inputMode="numeric" />
@@ -235,14 +243,15 @@ export function DealPanel({ role, deal, now, owner, runner, proofs, look, onAtte
       </div>
 
       {proofs.length > 0 ? (
-        <div className="stack" style={{ marginTop: 14 }}>
-          <h3>Dowody ze Steama</h3>
+        <Section title="Dowody ze Steama">
           {proofs.map((p) => (
             <ProofCard key={`${p.kind}-${p.observedAt}`} attestation={p} onChainHash={deal.lastEvidenceHash} />
           ))}
-        </div>
+        </Section>
       ) : deal.lastKind ? (
-        <p className="muted small">Ostatni dowód w programie: {deal.lastKind}, hash {deal.lastEvidenceHash.slice(0, 16)}…</p>
+        <Section>
+          <p className="muted small">Ostatni dowód w programie: {deal.lastKind}, hash {deal.lastEvidenceHash.slice(0, 16)}…</p>
+        </Section>
       ) : null}
     </Card>
   );

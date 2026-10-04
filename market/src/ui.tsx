@@ -2,9 +2,10 @@ import { useEffect, useState, type ReactNode } from "react";
 import type { ToastApi } from "./hooks";
 import type { PhaseState, TxPhase } from "./txPhase";
 
-export function Card({ title, aside, children }: { readonly title?: string; readonly aside?: ReactNode; readonly children: ReactNode }) {
+export function Card({ title, aside, top, children }: { readonly title?: string; readonly aside?: ReactNode; readonly top?: ReactNode; readonly children: ReactNode }) {
   return (
     <section className="card">
+      {top}
       {title ? (
         <div className="row between card-head">
           <h2>{title}</h2>
@@ -13,6 +14,45 @@ export function Card({ title, aside, children }: { readonly title?: string; read
       ) : null}
       {children}
     </section>
+  );
+}
+
+/** A titled block inside a card. */
+export function Section({ title, children }: { readonly title?: string; readonly children: ReactNode }) {
+  return (
+    <section className="section">
+      {title ? <h3>{title}</h3> : null}
+      {children}
+    </section>
+  );
+}
+
+const hueOf = (text: string): number => {
+  let hue = 0;
+  for (const char of text) hue = (hue * 31 + char.charCodeAt(0)) % 360;
+  return hue;
+};
+
+/** A round badge whose colour comes from the address, so the same wallet looks the same everywhere. */
+export function Avatar({ address }: { readonly address: string }) {
+  const hue = hueOf(address);
+  return (
+    <span className="avatar" style={{ background: `linear-gradient(135deg, hsl(${hue} 62% 56%), hsl(${(hue + 40) % 360} 64% 42%))` }} aria-hidden="true">
+      {address.slice(0, 2).toUpperCase()}
+    </span>
+  );
+}
+
+/** A wallet shown as avatar plus a short address that links to the Explorer. */
+export function Party({ address, short, href, tag }: { readonly address: string; readonly short: string; readonly href: string; readonly tag?: ReactNode }) {
+  return (
+    <span className="party">
+      <Avatar address={address} />
+      <a href={href} target="_blank" rel="noreferrer">
+        {short}
+      </a>
+      {tag}
+    </span>
   );
 }
 

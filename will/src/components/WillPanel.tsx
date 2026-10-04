@@ -4,11 +4,11 @@ import { explorerAddress, MAX_VETOES } from "../config";
 import { phaseOf, rolesOf, type Role, type Will } from "../data";
 import { formatUsdc, shortAddress } from "../format";
 import type { ActionRunner } from "../hooks";
-import { Card, Stat } from "../ui";
+import { Card, Party, Section, Stat } from "../ui";
 import { HeirsEditor } from "./HeirsEditor";
 import { HeirsTable } from "./HeirsTable";
-import { OwnerControls } from "./OwnerControls";
-import { PhaseBadge, PhaseTimer } from "./PhaseInfo";
+import { CheckInSection, DangerSection, FundsSection, GuardianSection } from "./OwnerControls";
+import { PhaseBadge, PhaseTimer, PhaseTracker } from "./PhaseInfo";
 
 export interface WillHandlers {
   readonly onCheckIn: () => void;
@@ -46,69 +46,81 @@ export function WillPanel({ will, now, me, runner, role, ...handlers }: WillPane
   const isHeir = role === "heir" && roles.includes("heir");
   const phase = phaseOf(will, now);
   const frozen = will.distributing;
+  const owner = will.owner.toBase58();
 
   return (
     <Card title="Szczegóły sejfu" aside={<PhaseBadge will={will} now={now} />}>
-      <div className="stack">
-        <div className="row">
+      <Section>
+        <div className="stats">
           <Stat label={frozen ? "Do podziału" : "W sejfie"} value={formatUsdc(frozen ? will.distributedTotal : will.balance)} />
-          <Stat label="Właściciel" value={<a href={explorerAddress(will.owner.toBase58())} target="_blank" rel="noreferrer">{shortAddress(will.owner)}</a>} />
-          <Stat label="Strażnik" value={will.guardian ? shortAddress(will.guardian) : "brak"} />
+          <Stat label="Właściciel" value={<Party address={owner} short={shortAddress(will.owner)} href={explorerAddress(owner)} />} />
+          <Stat
+            label="Strażnik"
+            value={
+              will.guardian ? (
+                <Party address={will.guardian.toBase58()} short={shortAddress(will.guardian)} href={explorerAddress(will.guardian.toBase58())} />
+              ) : (
+                "brak"
+              )
+            }
+          />
         </div>
+        <PhaseTracker will={will} now={now} />
         <PhaseTimer will={will} now={now} />
         {will.guardian ? (
           <span className="muted">
             Weta strażnika w tym cyklu: {will.vetoesUsed} z {MAX_VETOES}.
           </span>
         ) : null}
+      </Section>
 
-        <HeirsTable
-          will={will}
-          me={me}
-          canClaim={frozen && isHeir}
-          busy={runner.busy}
-          onClaim={handlers.onClaimShare}
-        />
+      <Section title="Spadkobiercy">
+        <HeirsTable will={will} me={me} canClaim={frozen && isHeir} busy={runner.busy} onClaim={handlers.onClaimShare} />
         <p className="muted">
-          {will.heirsLocked ? "Lista spadkobierców jest ostateczna. " : ""}Udziały liczone są od salda w chwili wypłaty, więc kolejne wpłaty zwiększają każdy z nich proporcjonalnie.
+          {will.heirsLocked ? "Lista spadkobierców jest ostateczna. " : ""}Udziały liczone są od salda w chwili wypłaty, więc kolejne wpłaty zwiększają każdy z nich
+          proporcjonalnie.
         </p>
+      </Section>
 
-        {isOwner && !frozen ? (
-          <>
-            <OwnerControls
-              will={will}
-              busy={runner.busy}
-              onCheckIn={handlers.onCheckIn}
-              onDeposit={handlers.onDeposit}
-              onWithdraw={handlers.onWithdraw}
-              onGuardian={handlers.onGuardian}
-              onCancel={handlers.onCancel}
-            />
-            {!will.heirsLocked ? <HeirsEditor will={will} busy={runner.busy} onSave={handlers.onSaveHeirs} onLock={handlers.onLockHeirs} /> : null}
-          </>
-        ) : null}
+      {isOwner && !frozen ? (
+        <>
+          <CheckInSection busy={runner.busy} onCheckIn={handlers.onCheckIn} />
+          <FundsSection busy={runner.busy} onDeposit={handlers.onDeposit} onWithdraw={handlers.onWithdraw} />
+          {!will.heirsLocked ? <HeirsEditor will={will} busy={runner.busy} onSave={handlers.onSaveHeirs} onLock={handlers.onLockHeirs} /> : null}
+          <GuardianSection will={will} busy={runner.busy} onGuardian={handlers.onGuardian} />
+          <DangerSection busy={runner.busy} onCancel={handlers.onCancel} />
+        </>
+      ) : null}
 
-        {isGuardian && !frozen ? (
-          <div className="stack">
-            <button disabled={runner.busy || phase === "active" || will.vetoesUsed >= MAX_VETOES} onClick={handlers.onVeto}>
-              Weto: właściciel żyje, zacznij odliczanie od nowa
-            </button>
-            <span className="muted">
-              {phase === "active"
-                ? "Weto jest możliwe dopiero, gdy właściciel zamilknie na cały okres ciszy."
-                : will.vetoesUsed >= MAX_VETOES
-                  ? "Wykorzystałeś oba weta. Licznik może zresetować już tylko właściciel."
-                  : "Zostało ci weto: użyj go, jeśli wiesz, że właściciel żyje."}
-            </span>
-          </div>
-        ) : null}
-
-        {isHeir && phase === "claimable" ? (
-          <button className="primary" disabled={runner.busy || !me} onClick={handlers.onTrigger}>
-            Uruchom wypłatę
+      {isGuardian && !frozen ? (
+        <Section title="Weto strażnika">
+          <p className="muted">
+            {phase === "active"
+              ? "Weto jest możliwe dopiero, gdy właściciel zamilknie na cały okres ciszy."
+              : will.vetoesUsed >= MAX_VETOES
+                ? "Wykorzystałeś oba weta. Licznik może zresetować już tylko właściciel."
+                : "Jeśli wiesz, że właściciel żyje, użyj weta: odliczanie zacznie się od nowa."}
+          </p>
+          <button className="primary" disabled={runner.busy || phase === "active" || will.vetoesUsed >= MAX_VETOES} onClick={handlers.onVeto}>
+            Weto: właściciel żyje, zacznij odliczanie od nowa
           </button>
-        ) : null}
-      </div>
+        </Section>
+      ) : null}
+
+      {isHeir && !frozen ? (
+        <Section title="Wypłata">
+          {phase === "claimable" ? (
+            <>
+              <p className="muted">Okres ciszy i procedury minął. Wypłatę może uruchomić każdy, a potem każdy spadkobierca odbiera swój udział.</p>
+              <button className="primary big-button" disabled={runner.busy || !me} onClick={handlers.onTrigger}>
+                Uruchom wypłatę
+              </button>
+            </>
+          ) : (
+            <p className="muted">Wypłatę będzie można uruchomić po upływie okresu ciszy i procedury. Do tego czasu właściciel może się jeszcze zameldować.</p>
+          )}
+        </Section>
+      ) : null}
     </Card>
   );
 }

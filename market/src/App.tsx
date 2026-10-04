@@ -86,6 +86,17 @@ export function App() {
     setTab("sell");
   };
 
+  const sellerTabs = (
+    <div className="tabs">
+      <button className={tab === "sell" ? "active" : ""} onClick={() => setTab("sell")}>
+        Wystaw skina
+      </button>
+      <button className={tab === "mine" ? "active" : ""} onClick={() => setTab("mine")}>
+        Moje ogłoszenia
+      </button>
+    </div>
+  );
+
   const needWallet = () => {
     if (!wallet || !owner) throw new Error("Połącz portfel.");
     return { wallet, owner };
@@ -138,23 +149,16 @@ export function App() {
             <div className="stack">
               {role === "seller" ? (
                 <>
-                  <div className="tabs">
-                    <button className={tab === "sell" ? "active" : ""} onClick={() => setTab("sell")}>
-                      Wystaw skina
-                    </button>
-                    <button className={tab === "mine" ? "active" : ""} onClick={() => setTab("mine")}>
-                      Moje ogłoszenia
-                    </button>
-                  </div>
                   {tab === "sell" ? (
                     <SellPanel
+                      top={sellerTabs}
                       owner={owner}
                       runner={runner}
                       onLoaded={(items) => setExtraLooks((current) => ({ ...current, ...Object.fromEntries(items.map((i) => [i.name, { icon: i.icon, color: i.color }])) }))}
                       onList={onList}
                     />
                   ) : (
-                    <MarketGrid key="seller" title="Moje ogłoszenia" filters={SELLER_FILTERS} deals={deals} now={now} owner={owner} selected={selected} iconFor={lookFor} onSelect={setSelected} />
+                    <MarketGrid key="seller" top={sellerTabs} title="Twoje transakcje" filters={SELLER_FILTERS} deals={deals} now={now} owner={owner} selected={selected} iconFor={lookFor} onSelect={setSelected} />
                   )}
                 </>
               ) : (
